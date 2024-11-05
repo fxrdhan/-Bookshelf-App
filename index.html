@@ -137,17 +137,78 @@
         color: var(--text-muted);
       }
 
-      /* Checkbox Style */
+      /* Custom Checkbox Style */
       .checkbox-wrapper {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 1rem;
+        position: relative;
+        cursor: pointer;
+        user-select: none;
+        padding: 0.5rem 0;
       }
 
-      input[type="checkbox"] {
-        width: 1.2rem;
-        height: 1.2rem;
-        accent-color: var(--primary-color);
+      .checkbox-wrapper input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+      }
+
+      .checkbox-wrapper .checkmark {
+        position: relative;
+        height: 25px;
+        width: 25px;
+        background-color: var(--input-bg);
+        border: 2px solid var(--border-color);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+      }
+
+      .checkbox-wrapper:hover input ~ .checkmark {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+      }
+
+      .checkbox-wrapper input:checked ~ .checkmark {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+        left: 8px;
+        top: 4px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+        transition: all 0.3s ease;
+      }
+
+      .checkbox-wrapper input:checked ~ .checkmark:after {
+        display: block;
+        animation: checkmark 0.2s ease-in-out;
+      }
+
+      @keyframes checkmark {
+        0% {
+          opacity: 0;
+          transform: rotate(45deg) scale(0);
+        }
+        100% {
+          opacity: 1;
+          transform: rotate(45deg) scale(1);
+        }
+      }
+
+      /* Optional: Add focus styles for accessibility */
+      .checkbox-wrapper input:focus ~ .checkmark {
+        box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2);
       }
 
       /* Button Styles */
@@ -499,12 +560,16 @@
             <input id="bookFormYear" type="number" required
               data-testid="bookFormYearInput" />
           </div>
-          <div class="form-group checkbox-wrapper">
-            <label for="bookFormIsComplete">Selesai dibaca</label>
-            <input
-              id="bookFormIsComplete"
-              type="checkbox"
-              data-testid="bookFormIsCompleteCheckbox" />
+          <div class="form-group">
+            <label class="checkbox-wrapper">
+              <span>Selesai dibaca</span>
+              <input
+                id="bookFormIsComplete"
+                type="checkbox"
+                data-testid="bookFormIsCompleteCheckbox"
+              />
+              <span class="checkmark"></span>
+            </label>
           </div>
           <button id="bookFormSubmit" type="submit"
             data-testid="bookFormSubmitButton">
