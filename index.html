@@ -554,9 +554,13 @@
         };
 
         const editBook = (id) => {
-          const book = books.find(b => b.id === id);
-          if (book) {
-            showEditForm(book);
+          if (editingBookId === id) {
+            hideEditForm();
+          } else {
+            const book = books.find(b => b.id === id);
+            if (book) {
+              showEditForm(book);
+            }
           }
         };
 
