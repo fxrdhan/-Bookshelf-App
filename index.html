@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Bookshelf App</title>
+        <style>
+      /* Modern CSS Reset */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* Variables */
+      :root {
+        --primary-color: #3b82f6;
+        --primary-dark: #2563eb;
+        --secondary-color: #64748b;
+        --success-color: #22c55e;
+        --danger-color: #ef4444;
+        --warning-color: #f59e0b;
+        --background-color: #f8fafc;
+        --text-color: #1e293b;
+        --border-color: #e2e8f0;
+      }
+
+      /* Global Styles */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background: var(--background-color);
+      }
+
+      /* Header Styles */
+      header {
+        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 2rem 1rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+
+      /* Main Content */
+      main {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+
+      section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      }
+
+      section h2 {
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+      }
+
+      /* Form Styles */
+      form {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      label {
+        font-weight: 500;
+        color: var(--secondary-color);
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      /* Checkbox Style */
+      .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      input[type="checkbox"] {
+        width: 1.2rem;
+        height: 1.2rem;
+        accent-color: var(--primary-color);
+      }
+
+      /* Button Styles */
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      button[type="submit"] {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      button[type="submit"]:hover {
+        background: var(--primary-dark);
+      }
+
+      /* Book List Styles */
+      .book-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+
+      .book-item {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .book-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .book-item h3 {
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+      }
+
+      .book-item p {
+        color: var(--secondary-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .book-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .btn-complete {
+        background: var(--success-color);
+        color: white;
+      }
+
+      .btn-delete {
+        background: var(--danger-color);
+        color: white;
+      }
+
+      .btn-edit {
+        background: var(--warning-color);
+        color: white;
+      }
+
+      /* Search Form */
+      #searchBook {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      #searchBook input {
+        flex: 1;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 2rem;
+        }
+
+        section {
+          padding: 1rem;
+        }
+
+        .book-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .book-actions {
+          flex-direction: column;
+        }
+
+        .book-actions button {
+          width: 100%;
+        }
+
+        #searchBook {
+          flex-direction: column;
+        }
+      }
+
+      /* Animation */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .book-item {
+        animation: fadeIn 0.3s ease-out;
+      }
+    </style>
+
+        <script>
+      // Wait for DOM to be fully loaded
+      document.addEventListener('DOMContentLoaded', () => {
+      // Book data structure
+      let books = JSON.parse(localStorage.getItem('books')) || [];
+
+      // DOM Elements
+      const bookForm = document.getElementById('bookForm');
+      const searchForm = document.getElementById('searchBook');
+      const incompleteList = document.getElementById('incompleteBookList');
+      const completeList = document.getElementById('completeBookList');
+
+      // Generate unique ID
+      const generateId = () => Date.now().toString();
+
+      // Save books to localStorage
+      const saveBooks = () => {
+        localStorage.setItem('books', JSON.stringify(books));
+      };
+
+      // Create book element
+      const createBookElement = (book) => {
+        const bookElement = document.createElement('div');
+        bookElement.className = 'book-item';
+        bookElement.setAttribute('data-bookid', book.id);
+        bookElement.setAttribute('data-testid', 'bookItem');
+
+        bookElement.innerHTML = `
+          <h3 data-testid="bookItemTitle">${book.title}</h3>
+          <p data-testid="bookItemAuthor">Penulis: ${book.author}</p>
+          <p data-testid="bookItemYear">Tahun: ${book.year}</p>
+          <div class="book-actions">
+            <button class="btn-complete" data-testid="bookItemIsCompleteButton">
+              ${book.isComplete ? 'Belum selesai dibaca' : 'Selesai dibaca'}
+            </button>
+            <button class="btn-delete" data-testid="bookItemDeleteButton">Hapus Buku</button>
+            <button class="btn-edit" data-testid="bookItemEditButton">Edit Buku</button>
+          </div>
+        `;
+
+        // Event Listeners
+        const completeButton = bookElement.querySelector('[data-testid="bookItemIsCompleteButton"]');
+        const deleteButton = bookElement.querySelector('[data-testid="bookItemDeleteButton"]');
+        const editButton = bookElement.querySelector('[data-testid="bookItemEditButton"]');
+
+        completeButton.onclick = () => toggleBookComplete(book.id);
+        deleteButton.onclick = () => deleteBook(book.id);
+        editButton.onclick = () => editBook(book.id);
+
+        return bookElement;
+      };
+
+      // Render books
+      const renderBooks = (filteredBooks = books) => {
+        incompleteList.innerHTML = '';
+        completeList.innerHTML = '';
+
+        filteredBooks.forEach(book => {
+          const bookElement = createBookElement(book);
+          if (book.isComplete) {
+            completeList.appendChild(bookElement);
+          } else {
+            incompleteList.appendChild(bookElement);
+          }
+        });
+      };
+
+      // Add new book
+      const addBook = (event) => {
+        event.preventDefault();
+
+        const title = document.getElementById('bookFormTitle').value;
+        const author = document.getElementById('bookFormAuthor').value;
+        const year = parseInt(document.getElementById('bookFormYear').value);
+        const isComplete = document.getElementById('bookFormIsComplete').checked;
+
+        const newBook = {
+          id: generateId(),
+          title,
+          author,
+          year,
+          isComplete
+        };
+
+        books.push(newBook);
+        saveBooks();
+        renderBooks();
+        event.target.reset();
+      };
+
+      // Toggle book complete status
+      const toggleBookComplete = (id) => {
+        const book = books.find(b => b.id === id);
+        if (book) {
+          book.isComplete = !book.isComplete;
+          saveBooks();
+          renderBooks();
+        }
+      };
+
+      // Delete book
+      const deleteBook = (id) => {
+        if (confirm('Apakah Anda yakin ingin menghapus buku ini?')) {
+          books = books.filter(b => b.id !== id);
+          saveBooks();
+          renderBooks();
+        }
+      };
+
+      // Edit book
+      const editBook = (id) => {
+        const book = books.find(b => b.id === id);
+        if (book) {
+          document.getElementById('bookFormTitle').value = book.title;
+          document.getElementById('bookFormAuthor').value = book.author;
+          document.getElementById('bookFormYear').value = book.year;
+          document.getElementById('bookFormIsComplete').checked = book.isComplete;
+
+          // Remove the old book
+          books = books.filter(b => b.id !== id);
+          saveBooks();
+        }
+      };
+
+      // Search books
+      const searchBooks = (event) => {
+        event.preventDefault();
+        const searchTerm = document.getElementById('searchBookTitle').value.toLowerCase();
+        const filteredBooks = books.filter(book => 
+          book.title.toLowerCase().includes(searchTerm)
+        );
+        renderBooks(filteredBooks);
+      };
+
+      // Event Listeners
+      bookForm.addEventListener('submit', addBook);
+      searchForm.addEventListener('submit', searchBooks);
+
+      // Initial render
+      renderBooks();
+      });
+    </script>
+    </head>
+    <body>
+        <header>
+            <h1>Bookshelf App</h1>
+        </header>
+
+        <main>
+            <section>
+                <h2>Tambah Buku Baru</h2>
+                <form id="bookForm" data-testid="bookForm">
+                    <div class="form-group">
+                        <label for="bookFormTitle">Judul</label>
+                        <input id="bookFormTitle" type="text" required
+                            data-testid="bookFormTitleInput" />
+                    </div>
+                    <div class="form-group">
+                        <label for="bookFormAuthor">Penulis</label>
+                        <input id="bookFormAuthor" type="text" required
+                            data-testid="bookFormAuthorInput" />
+                    </div>
+                    <div class="form-group">
+                        <label for="bookFormYear">Tahun</label>
+                        <input id="bookFormYear" type="number" required
+                            data-testid="bookFormYearInput" />
+                    </div>
+                    <div class="form-group checkbox-wrapper">
+                        <label for="bookFormIsComplete">Selesai dibaca</label>
+                        <input
+                            id="bookFormIsComplete"
+                            type="checkbox"
+                            data-testid="bookFormIsCompleteCheckbox" />
+                    </div>
+                    <button id="bookFormSubmit" type="submit"
+                        data-testid="bookFormSubmitButton">
+                        Masukkan Buku ke rak <span>Belum selesai dibaca</span>
+                    </button>
+                </form>
+            </section>
+
+            <section>
+                <h2>Cari Buku</h2>
+                <form id="searchBook" data-testid="searchBookForm">
+                    <input id="searchBookTitle" type="text"
+                        placeholder="Cari judul buku..."
+                        data-testid="searchBookFormTitleInput" />
+                    <button id="searchSubmit" type="submit"
+                        data-testid="searchBookFormSubmitButton">
+                        Cari
+                    </button>
+                </form>
+            </section>
+
+            <section>
+                <h2>Belum selesai dibaca</h2>
+                <div id="incompleteBookList" class="book-grid"
+                    data-testid="incompleteBookList"></div>
+            </section>
+
+            <section>
+                <h2>Selesai dibaca</h2>
+                <div id="completeBookList" class="book-grid"
+                    data-testid="completeBookList"></div>
+            </section>
+        </main>
+    </body>
+</html>
