@@ -184,26 +184,6 @@ const bookData = {
 };
 ```
 
-## How to Use
-
-1. Clone this repository
-2. Open the `index.html` file in a browser
-3. Start adding books by filling in the "Add New Book" form
-4. Use the search feature to find books
-5. Manage reading status and edit book information as needed
-
-## Future Development
-
-- [ ] Toggle to Light Mode theme feature
-- [ ] Implement book category feature
-- [ ] Add a cover image for books
-- [ ] Add a tag system for books
-- [ ] Sorting feature based on various parameters
-
-## Contribution
-
-Contributions are always welcome. For major changes, please open an issue first to discuss what you would like to change.
-
 ## License
 
 MIT
