@@ -255,6 +255,16 @@
         box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
       }
 
+      .btn-save {
+        background: var(--success-color);
+        color: white;
+      }
+
+      .btn-cancel {
+        background: var(--danger-color);
+        color: white;
+      }
+
       /* Book List Styles */
       .book-grid {
         display: grid;
@@ -578,8 +588,15 @@
           hideEditForm();
         };
 
+        // Event listener for cancel button
+        const handleEditFormCancel = (event) => {
+          event.preventDefault();
+          hideEditForm();
+        };
+
         // Event listener for edit form submission
         editForm.addEventListener('submit', handleEditFormSubmit);
+        document.getElementById('editFormCancel').addEventListener('click', handleEditFormCancel);
 
         // Event Listeners
         bookForm.addEventListener('submit', addBook);
@@ -680,7 +697,8 @@
               <span class="checkmark"></span>
             </label>
           </div>
-          <button id="editFormSubmit" type="submit" data-testid="editFormSubmitButton">Simpan Perubahan</button>
+          <button id="editFormSubmit" type="submit" class="btn-save" data-testid="editFormSubmitButton">Simpan Perubahan</button>
+          <button id="editFormCancel" type="button" class="btn-cancel" data-testid="editFormCancelButton">Batalkan Perubahan</button>
         </form>
       </section>
     </main>
