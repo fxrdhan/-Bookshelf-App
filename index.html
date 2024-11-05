@@ -469,6 +469,10 @@
           const title = document.getElementById('bookFormTitle').value;
           const author = document.getElementById('bookFormAuthor').value;
           const year = parseInt(document.getElementById('bookFormYear').value);
+          if (isNaN(year) || year < 0) {
+            alert('Tahun harus berupa angka positif.');
+            return;
+          }
           const isComplete = document.getElementById('bookFormIsComplete').checked;
 
           const newBook = {
@@ -557,7 +561,7 @@
           </div>
           <div class="form-group">
             <label for="bookFormYear">Tahun</label>
-            <input id="bookFormYear" type="number" required
+            <input id="bookFormYear" type="number" required min="0" step="1"
               data-testid="bookFormYearInput" />
           </div>
           <div class="form-group">
