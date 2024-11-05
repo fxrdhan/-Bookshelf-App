@@ -380,6 +380,17 @@
       .book-item {
         animation: fadeIn 0.3s ease-out;
       }
+
+      .edit-form {
+        display: none;
+        background: var(--surface-color);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+      }
     </style>
 
     <script>
@@ -510,14 +521,7 @@
         const editBook = (id) => {
           const book = books.find(b => b.id === id);
           if (book) {
-            document.getElementById('bookFormTitle').value = book.title;
-            document.getElementById('bookFormAuthor').value = book.author;
-            document.getElementById('bookFormYear').value = book.year;
-            document.getElementById('bookFormIsComplete').checked = book.isComplete;
-            updateSubmitButtonText(book.isComplete); // Update button text when editing
-
-            books = books.filter(b => b.id !== id);
-            saveBooks();
+            showEditForm(book);
           }
         };
 
@@ -529,6 +533,50 @@
           );
           renderBooks(filteredBooks);
         };
+
+        // DOM Elements for edit form
+        const editForm = document.getElementById('editForm');
+        const editFormTitle = document.getElementById('editFormTitle');
+        const editFormAuthor = document.getElementById('editFormAuthor');
+        const editFormYear = document.getElementById('editFormYear');
+        const editFormIsComplete = document.getElementById('editFormIsComplete');
+        const editFormSubmit = document.getElementById('editFormSubmit');
+        let editingBookId = null;
+
+        // Show edit form
+        const showEditForm = (book) => {
+          editFormTitle.value = book.title;
+          editFormAuthor.value = book.author;
+          editFormYear.value = book.year;
+          editFormIsComplete.checked = book.isComplete;
+          editingBookId = book.id;
+          editForm.style.display = 'block';
+        };
+
+        // Hide edit form
+        const hideEditForm = () => {
+          editForm.style.display = 'none';
+          editingBookId = null;
+        };
+
+        // Handle edit form submission
+        const handleEditFormSubmit = (event) => {
+          event.preventDefault();
+          const updatedBook = {
+            id: editingBookId,
+            title: editFormTitle.value,
+            author: editFormAuthor.value,
+            year: parseInt(editFormYear.value),
+            isComplete: editFormIsComplete.checked
+          };
+          books = books.map(book => book.id === editingBookId ? updatedBook : book);
+          saveBooks();
+          renderBooks();
+          hideEditForm();
+        };
+
+        // Event listener for edit form submission
+        editForm.addEventListener('submit', handleEditFormSubmit);
 
         // Event Listeners
         bookForm.addEventListener('submit', addBook);
@@ -605,6 +653,32 @@
         <h2>Selesai dibaca</h2>
         <div id="completeBookList" class="book-grid"
           data-testid="completeBookList"></div>
+      </section>
+
+      <section class="edit-form" id="editForm">
+        <h2>Edit Buku</h2>
+        <form data-testid="editForm">
+          <div class="form-group">
+            <label for="editFormTitle">Judul</label>
+            <input id="editFormTitle" type="text" required data-testid="editFormTitleInput" />
+          </div>
+          <div class="form-group">
+            <label for="editFormAuthor">Penulis</label>
+            <input id="editFormAuthor" type="text" required data-testid="editFormAuthorInput" />
+          </div>
+          <div class="form-group">
+            <label for="editFormYear">Tahun</label>
+            <input id="editFormYear" type="number" required min="0" step="1" data-testid="editFormYearInput" />
+          </div>
+          <div class="form-group">
+            <label class="checkbox-wrapper">
+              <span>Selesai dibaca</span>
+              <input id="editFormIsComplete" type="checkbox" data-testid="editFormIsCompleteCheckbox" />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <button id="editFormSubmit" type="submit" data-testid="editFormSubmitButton">Simpan Perubahan</button>
+        </form>
       </section>
     </main>
   </body>
