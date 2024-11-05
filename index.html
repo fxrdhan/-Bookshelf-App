@@ -413,6 +413,16 @@
         border: 1px solid var(--border-color);
         backdrop-filter: blur(10px);
       }
+
+      .notification {
+        display: none;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        background-color: var(--danger-color);
+        color: white;
+        text-align: center;
+      }
     </style>
 
     <script>
@@ -557,6 +567,14 @@
             book.title.toLowerCase().includes(searchTerm)
           );
           renderBooks(filteredBooks);
+
+          const notification = document.getElementById('notification');
+          if (filteredBooks.length === 0) {
+            notification.style.display = 'block';
+            notification.textContent = 'Buku tidak ditemukan!';
+          } else {
+            notification.style.display = 'none';
+          }
         };
 
         // DOM Elements for edit form
@@ -673,6 +691,7 @@
             Cari
           </button>
         </form>
+        <div id="notification" class="notification" data-testid="notification"></div>
       </section>
 
       <section>
