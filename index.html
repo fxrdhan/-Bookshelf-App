@@ -13,10 +13,10 @@
       }
 
       :root {
+        --success-color: #10b981;
         --primary-color: #6d28d9;
         --primary-dark: #5b21b6;
         --secondary-color: #94a3b8;
-        --success-color: #10b981;
         --danger-color: #ef4444;
         --warning-color: #f59e0b;
         --background-color: #0f172a;
@@ -246,7 +246,7 @@
       }
 
       button[type="submit"] {
-        background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+        background: var(--primary-color);
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
       }
 
@@ -256,13 +256,25 @@
       }
 
       .btn-save {
-        background: var(--success-color);
+        background: var(--success-color) !important;
         color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
       }
 
       .btn-cancel {
         background: var(--danger-color);
         color: white;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
       }
 
       /* Book List Styles */
