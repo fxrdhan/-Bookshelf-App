@@ -7,10 +7,11 @@
 }
 
 :root {
-  --success-color: #10b981;
   --primary-color: #6d28d9;
+  --primary-light: #a78bfa;
   --primary-dark: #5b21b6;
   --secondary-color: #94a3b8;
+  --success-color: #10b981;
   --danger-color: #ef4444;
   --warning-color: #f59e0b;
   --background-color: #0f172a;
@@ -422,4 +423,22 @@ button[type="submit"]:hover {
   background-color: var(--danger-color);
   color: white;
   text-align: center;
+}
+
+footer {
+  background: var(--surface-color);
+  color: var(--text-color);
+  text-align: center;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+footer a {
+  color: var(--primary-light);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: var(--primary-dark);
 }
