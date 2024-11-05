@@ -8,7 +8,6 @@
     <script src="js/script.js" defer></script>
   </head>
   <body>
-    <!-- HTML structure remains the same -->
     <header>
       <h1>Bookshelf App</h1>
     </header>
@@ -22,8 +21,7 @@
               id="bookFormTitle"
               type="text"
               required
-              data-testid="bookFormTitleInput"
-            />
+              data-testid="bookFormTitleInput" />
           </div>
           <div class="form-group">
             <label for="bookFormAuthor">Penulis</label>
@@ -31,8 +29,7 @@
               id="bookFormAuthor"
               type="text"
               required
-              data-testid="bookFormAuthorInput"
-            />
+              data-testid="bookFormAuthorInput" />
           </div>
           <div class="form-group">
             <label for="bookFormYear">Tahun</label>
@@ -42,8 +39,7 @@
               required
               min="0"
               step="1"
-              data-testid="bookFormYearInput"
-            />
+              data-testid="bookFormYearInput" />
           </div>
           <div class="form-group">
             <label class="checkbox-wrapper">
@@ -51,16 +47,14 @@
               <input
                 id="bookFormIsComplete"
                 type="checkbox"
-                data-testid="bookFormIsCompleteCheckbox"
-              />
+                data-testid="bookFormIsCompleteCheckbox" />
               <span class="checkmark"></span>
             </label>
           </div>
           <button
             id="bookFormSubmit"
             type="submit"
-            data-testid="bookFormSubmitButton"
-          >
+            data-testid="bookFormSubmitButton">
             Masukkan Buku ke rak
             <span>Belum selesai dibaca</span>
           </button>
@@ -73,37 +67,32 @@
             id="searchBookTitle"
             type="text"
             placeholder="Cari judul buku..."
-            data-testid="searchBookFormTitleInput"
-          />
+            data-testid="searchBookFormTitleInput" />
           <button
             id="searchSubmit"
             type="submit"
-            data-testid="searchBookFormSubmitButton"
-          >
+            data-testid="searchBookFormSubmitButton">
             Cari
           </button>
         </form>
         <div
           id="notification"
           class="notification"
-          data-testid="notification"
-        ></div>
+          data-testid="notification"></div>
       </section>
       <section>
         <h2>Belum selesai dibaca</h2>
         <div
           id="incompleteBookList"
           class="book-grid"
-          data-testid="incompleteBookList"
-        ></div>
+          data-testid="incompleteBookList"></div>
       </section>
       <section>
         <h2>Selesai dibaca</h2>
         <div
           id="completeBookList"
           class="book-grid"
-          data-testid="completeBookList"
-        ></div>
+          data-testid="completeBookList"></div>
       </section>
       <section class="edit-form" id="editForm">
         <h2>Edit Buku</h2>
@@ -114,8 +103,7 @@
               id="editFormTitle"
               type="text"
               required
-              data-testid="editFormTitleInput"
-            />
+              data-testid="editFormTitleInput" />
           </div>
           <div class="form-group">
             <label for="editFormAuthor">Penulis</label>
@@ -123,8 +111,7 @@
               id="editFormAuthor"
               type="text"
               required
-              data-testid="editFormAuthorInput"
-            />
+              data-testid="editFormAuthorInput" />
           </div>
           <div class="form-group">
             <label for="editFormYear">Tahun</label>
@@ -134,8 +121,7 @@
               required
               min="0"
               step="1"
-              data-testid="editFormYearInput"
-            />
+              data-testid="editFormYearInput" />
           </div>
           <div class="form-group">
             <label class="checkbox-wrapper">
@@ -143,8 +129,7 @@
               <input
                 id="editFormIsComplete"
                 type="checkbox"
-                data-testid="editFormIsCompleteCheckbox"
-              />
+                data-testid="editFormIsCompleteCheckbox" />
               <span class="checkmark"></span>
             </label>
           </div>
@@ -152,16 +137,14 @@
             id="editFormSubmit"
             type="submit"
             class="btn-save"
-            data-testid="editFormSubmitButton"
-          >
+            data-testid="editFormSubmitButton">
             Simpan Perubahan
           </button>
           <button
             id="editFormCancel"
             type="button"
             class="btn-cancel"
-            data-testid="editFormCancelButton"
-          >
+            data-testid="editFormCancelButton">
             Batalkan Perubahan
           </button>
         </form>
