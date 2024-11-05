@@ -515,6 +515,9 @@
             books = books.filter(b => b.id !== id);
             saveBooks();
             renderBooks();
+            if (editingBookId === id) {
+              hideEditForm();
+            }
           }
         };
 
