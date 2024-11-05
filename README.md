@@ -194,7 +194,9 @@ const bookData = {
 
 ## Future Development
 
+- [ ] Toggle to Light Mode theme feature
 - [ ] Implement book category feature
+- [ ] Add a cover image for books
 - [ ] Add a tag system for books
 - [ ] Sorting feature based on various parameters
 
