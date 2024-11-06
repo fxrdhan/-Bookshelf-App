@@ -28,7 +28,7 @@
 
 :root[data-theme="light"] {
   --primary-color: #6d28d9;
-  --primary-light: #7c3aed;
+  --primary-light: #D4BEE4;
   --primary-dark: #5b21b6;
   --secondary-color: #64748b;
   --success-color: #10b981;
@@ -461,6 +461,15 @@ footer a {
 
 footer a:hover {
   color: var(--primary-dark);
+}
+
+/* Add these new styles */
+:root[data-theme="light"] footer a {
+  color: var(--primary-color);
+}
+
+:root[data-theme="light"] footer a:hover {
+  color: var(--primary-light);
 }
 
 .theme-toggle {
