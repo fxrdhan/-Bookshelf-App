@@ -109,22 +109,6 @@ document.addEventListener("DOMContentLoaded", () => {
       actionsMenu.classList.toggle("show");
     });
 
-    // Close menu when clicking outside
-    document.addEventListener("click", (e) => {
-      if (!bookElement.contains(e.target)) {
-        actionsMenu.classList.remove("show");
-      }
-    });
-
-    // Add this new event listener to close menu when clicking outside
-    document.addEventListener('click', (e) => {
-      const menu = bookElement.querySelector('.book-actions');
-      const toggle = bookElement.querySelector('.book-menu-toggle');
-      if (!menu.contains(e.target) && !toggle.contains(e.target)) {
-        menu.classList.remove('show');
-      }
-    });
-
     completeButton.onclick = () => {
       actionsMenu.classList.remove("show");
       toggleBookComplete(book.id);
@@ -133,9 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
       actionsMenu.classList.remove("show");
       deleteBook(book.id);
     };
-    editButton.onclick = () => {
+    editButton.onclick = (e) => {
+      e.stopPropagation(); // Hentikan event bubbling
       actionsMenu.classList.remove("show");
-      editBook(book.id);
+      editBook(book.id); // Langsung panggil editBook dengan book.id
     };
 
     return bookElement;
@@ -228,13 +213,9 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   const editBook = (id) => {
-    if (editingBookId === id) {
-      hideEditForm();
-    } else {
-      const book = books.find((b) => b.id === id);
-      if (book) {
-        showEditForm(book);
-      }
+    const book = books.find((b) => b.id === id);
+    if (book) {
+      showEditForm(book);
     }
   };
 
@@ -282,7 +263,6 @@ document.addEventListener("DOMContentLoaded", () => {
     editFormTitle.value = book.title;
     editFormAuthor.value = book.author;
     editFormYear.value = book.year;
-    editFormIsComplete.checked = book.isComplete;
     editingBookId = book.id;
     openEditBookModal();
   };
@@ -294,12 +274,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const handleEditFormSubmit = (event) => {
     event.preventDefault();
+    const book = books.find(b => b.id === editingBookId);
     const updatedBook = {
       id: editingBookId,
       title: editFormTitle.value,
       author: editFormAuthor.value,
       year: parseInt(editFormYear.value),
-      isComplete: editFormIsComplete.checked,
+      isComplete: book.isComplete // Gunakan status sebelumnya
     };
     books = books.map((book) =>
       book.id === editingBookId ? updatedBook : book

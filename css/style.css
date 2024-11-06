@@ -912,3 +912,13 @@ body.modal-open {
     opacity: 1;
   }
 }
+
+/* Add space between last form group and buttons */
+#editForm .form-group:last-of-type {
+  margin-bottom: 2rem;
+}
+
+/* Add space between buttons */
+#editForm button + button {
+  margin-top: 0.5rem;
+}
