@@ -631,6 +631,76 @@ body[data-theme="light"] {
   border: 1px solid var(--border-color);
 }
 
+.modal-header {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.close-button {
+  position: absolute;
+  top: -1rem;
+  right: -1rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  font-size: 1.5rem;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.close-button:hover {
+  background: var(--input-bg);
+  transform: scale(1.1);
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  position: relative;
+  background: var(--surface-color);
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  animation: modalSlideIn 0.3s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-color);
+}
+
 /* Update modal header styles */
 .modal-header {
   position: relative;
@@ -748,4 +818,97 @@ body.modal-open {
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.book-item {
+  position: relative;
+}
+
+.book-content {
+  padding-right: 2.5rem;
+}
+
+.book-menu-toggle {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+}
+
+.book-menu-toggle:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.book-actions {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 160px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 3;
+}
+
+.book-actions.show {
+  display: flex;
+}
+
+.book-actions button {
+  width: 100%;
+  padding: 0.5rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.book-actions button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.book-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.book-actions .btn-complete {
+  color: var (--success-color);
+}
+
+.book-actions .btn-edit {
+  color: var(--warning-color);
+}
+
+.book-actions .btn-delete {
+  color: var(--danger-color);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

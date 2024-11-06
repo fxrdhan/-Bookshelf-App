@@ -114,60 +114,65 @@
           class="book-grid"
           data-testid="completeBookList"></div>
       </section>
-      <section class="edit-form" id="editForm">
-        <h2>Edit Buku</h2>
-        <form data-testid="editForm">
-          <div class="form-group">
-            <label for="editFormTitle">Judul</label>
-            <input
-              id="editFormTitle"
-              type="text"
-              required
-              data-testid="editFormTitleInput" />
+      <section id="editBookModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Edit Buku</h2>
+            <button class="close-button" id="closeEditBook">&times;</button>
           </div>
-          <div class="form-group">
-            <label for="editFormAuthor">Penulis</label>
-            <input
-              id="editFormAuthor"
-              type="text"
-              required
-              data-testid="editFormAuthorInput" />
-          </div>
-          <div class="form-group">
-            <label for="editFormYear">Tahun</label>
-            <input
-              id="editFormYear"
-              type="number"
-              required
-              min="0"
-              step="1"
-              data-testid="editFormYearInput" />
-          </div>
-          <div class="form-group">
-            <label class="checkbox-wrapper">
-              <span>Selesai dibaca</span>
+          <form id="editForm" data-testid="editForm">
+            <div class="form-group">
+              <label for="editFormTitle">Judul</label>
               <input
-                id="editFormIsComplete"
-                type="checkbox"
-                data-testid="editFormIsCompleteCheckbox" />
-              <span class="checkmark"></span>
-            </label>
-          </div>
-          <button
-            id="editFormSubmit"
-            type="submit"
-            class="btn-save"
-            data-testid="editFormSubmitButton">
-            Simpan Perubahan
-          </button>
-          <button
-            id="editFormCancel"
-            type="button"
-            class="btn-cancel"
-            data-testid="editFormCancelButton">
-            Batalkan Perubahan
-          </button>
-        </form>
+                id="editFormTitle"
+                type="text"
+                required
+                data-testid="editFormTitleInput" />
+            </div>
+            <div class="form-group">
+              <label for="editFormAuthor">Penulis</label>
+              <input
+                id="editFormAuthor"
+                type="text"
+                required
+                data-testid="editFormAuthorInput" />
+            </div>
+            <div class="form-group">
+              <label for="editFormYear">Tahun</label>
+              <input
+                id="editFormYear"
+                type="number"
+                required
+                min="0"
+                step="1"
+                data-testid="editFormYearInput" />
+            </div>
+            <div class="form-group">
+              <label class="checkbox-wrapper">
+                <span>Selesai dibaca</span>
+                <input
+                  id="editFormIsComplete"
+                  type="checkbox"
+                  data-testid="editFormIsCompleteCheckbox" />
+                <span class="checkmark"></span>
+              </label>
+            </div>
+            <button
+              id="editFormSubmit"
+              type="submit"
+              class="btn-save"
+              data-testid="editFormSubmitButton">
+              Simpan Perubahan
+            </button>
+            <button
+              id="editFormCancel"
+              type="button"
+              class="btn-cancel"
+              data-testid="editFormCancelButton">
+              Batalkan Perubahan
+            </button>
+          </form>
+        </div>
       </section>
     </main>
     <footer>

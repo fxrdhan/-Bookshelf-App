@@ -58,43 +58,85 @@ document.addEventListener("DOMContentLoaded", () => {
     bookElement.setAttribute("data-testid", "bookItem");
 
     bookElement.innerHTML = `
-      <h3 data-testid="bookItemTitle">${book.title}</h3>
-      <p data-testid="bookItemAuthor">Penulis: ${book.author}</p>
-      <p data-testid="bookItemYear">Tahun: ${book.year}</p>
+      <div class="book-content">
+        <h3 data-testid="bookItemTitle">${book.title}</h3>
+        <p data-testid="bookItemAuthor">Penulis: ${book.author}</p>
+        <p data-testid="bookItemYear">Tahun: ${book.year}</p>
+      </div>
+      <button class="book-menu-toggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+        </svg>
+      </button>
       <div class="book-actions">
         <button class="btn-complete" data-testid="bookItemIsCompleteButton">
+        ${book.isComplete ? 
+        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+          <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
+        </svg>` :
+        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5m8.854-9.646a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z"/>
+        </svg>`
+        }
           ${book.isComplete ? "Belum selesai dibaca" : "Selesai dibaca"}
         </button>
-        <button class="btn-delete" data-testid="bookItemDeleteButton" style="display: flex; align-items: center; justify-content: center;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin-right: 4px;">
-            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-          </svg>
-          <span>Hapus</span>
-        </button>
-        <button class="btn-edit" data-testid="bookItemEditButton" style="display: flex; align-items: center; justify-content: center;">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16" style="margin-right: 4px;">
+        <button class="btn-edit" data-testid="bookItemEditButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
           </svg>
-          <span>Edit</span>
+          Edit
+        </button>
+        <button class="btn-delete" data-testid="bookItemDeleteButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+          </svg>
+          Hapus
         </button>
       </div>
     `;
 
-    const completeButton = bookElement.querySelector(
-      '[data-testid="bookItemIsCompleteButton"]'
-    );
-    const deleteButton = bookElement.querySelector(
-      '[data-testid="bookItemDeleteButton"]'
-    );
-    const editButton = bookElement.querySelector(
-      '[data-testid="bookItemEditButton"]'
-    );
+    const menuToggle = bookElement.querySelector(".book-menu-toggle");
+    const actionsMenu = bookElement.querySelector(".book-actions");
+    const completeButton = bookElement.querySelector('[data-testid="bookItemIsCompleteButton"]');
+    const deleteButton = bookElement.querySelector('[data-testid="bookItemDeleteButton"]');
+    const editButton = bookElement.querySelector('[data-testid="bookItemEditButton"]');
 
-    completeButton.onclick = () => toggleBookComplete(book.id);
-    deleteButton.onclick = () => deleteBook(book.id);
-    editButton.onclick = () => editBook(book.id);
+    menuToggle.addEventListener("click", (e) => {
+      e.stopPropagation();
+      actionsMenu.classList.toggle("show");
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!bookElement.contains(e.target)) {
+        actionsMenu.classList.remove("show");
+      }
+    });
+
+    // Add this new event listener to close menu when clicking outside
+    document.addEventListener('click', (e) => {
+      const menu = bookElement.querySelector('.book-actions');
+      const toggle = bookElement.querySelector('.book-menu-toggle');
+      if (!menu.contains(e.target) && !toggle.contains(e.target)) {
+        menu.classList.remove('show');
+      }
+    });
+
+    completeButton.onclick = () => {
+      actionsMenu.classList.remove("show");
+      toggleBookComplete(book.id);
+    };
+    deleteButton.onclick = () => {
+      actionsMenu.classList.remove("show");
+      deleteBook(book.id);
+    };
+    editButton.onclick = () => {
+      actionsMenu.classList.remove("show");
+      editBook(book.id);
+    };
 
     return bookElement;
   };
@@ -214,17 +256,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const editFormSubmit = document.getElementById("editFormSubmit");
   let editingBookId = null;
 
+  const editBookModal = document.getElementById("editBookModal");
+  const closeEditBookBtn = document.getElementById("closeEditBook");
+
+  const openEditBookModal = () => {
+    editBookModal.style.display = "block";
+    document.body.classList.add("modal-open");
+  };
+
+  const closeEditBookModal = () => {
+    editBookModal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  };
+
+  closeEditBookBtn.addEventListener("click", closeEditBookModal);
+
+  // Close modal when clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === editBookModal) {
+      closeEditBookModal();
+    }
+  });
+
   const showEditForm = (book) => {
     editFormTitle.value = book.title;
     editFormAuthor.value = book.author;
     editFormYear.value = book.year;
     editFormIsComplete.checked = book.isComplete;
     editingBookId = book.id;
-    editForm.style.display = "block";
+    openEditBookModal();
   };
 
   const hideEditForm = () => {
-    editForm.style.display = "none";
+    closeEditBookModal();
     editingBookId = null;
   };
 
