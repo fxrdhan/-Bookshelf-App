@@ -447,6 +447,32 @@ button[type="submit"]:hover {
   background-color: var(--danger-color);
   color: white;
   text-align: center;
+  position: relative; /* Add this */
+}
+
+/* Add these new styles */
+.notification-close {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 28px;  /* Increased from 24px */
+  height: 28px; /* Increased from 24px */
+  font-size: 20px; /* Added to make the × symbol larger */
+  line-height: 1; /* Added to better center the × symbol */
+}
+
+.notification-close:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 footer {

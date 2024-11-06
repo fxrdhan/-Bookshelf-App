@@ -208,8 +208,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const notification = document.getElementById("notification");
     if (filteredBooks.length === 0) {
+      notification.innerHTML = `
+        Buku tidak ditemukan!
+        <button class="notification-close" onclick="document.getElementById('notification').style.display='none'" style="font-size: 20px;">
+          &times;
+        </button>
+      `;
       notification.style.display = "block";
-      notification.textContent = "Buku tidak ditemukan!";
     } else {
       notification.style.display = "none";
     }
