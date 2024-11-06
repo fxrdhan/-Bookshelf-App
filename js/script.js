@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let books = JSON.parse(localStorage.getItem("books")) || [];
 
   const bookForm = document.getElementById("bookForm");
-  const searchForm = document.getElementById("searchBook");
+  const searchInput = document.getElementById("searchBookTitle");
   const incompleteList = document.getElementById("incompleteBookList");
   const completeList = document.getElementById("completeBookList");
   const isCompleteCheckbox = document.getElementById("bookFormIsComplete");
@@ -196,29 +196,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  const searchBooks = (event) => {
-    event.preventDefault();
-    const searchTerm = document
-      .getElementById("searchBookTitle")
-      .value.toLowerCase();
+  const searchBooks = () => {
+    const searchTerm = searchInput.value.toLowerCase();
     const filteredBooks = books.filter((book) =>
       book.title.toLowerCase().includes(searchTerm)
     );
     renderBooks(filteredBooks);
-
-    const notification = document.getElementById("notification");
-    if (filteredBooks.length === 0) {
-      notification.innerHTML = `
-        Buku tidak ditemukan!
-        <button class="notification-close" onclick="document.getElementById('notification').style.display='none'" style="font-size: 20px;">
-          &times;
-        </button>
-      `;
-      notification.style.display = "block";
-    } else {
-      notification.style.display = "none";
-    }
   };
+
+  searchInput.addEventListener("input", searchBooks);
 
   const editForm = document.getElementById("editForm");
   const editFormTitle = document.getElementById("editFormTitle");
@@ -270,7 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", handleEditFormCancel);
 
   bookForm.addEventListener("submit", addBook);
-  searchForm.addEventListener("submit", searchBooks);
 
   renderBooks();
 });

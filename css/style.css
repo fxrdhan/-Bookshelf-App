@@ -386,6 +386,24 @@ button[type="submit"]:hover {
   flex: 1;
 }
 
+#searchBookTitle {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+#searchBookTitle:focus {
+  border-color: var(--primary-color);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2);
+  background: var(--surface-color);
+}
+
 @media (max-width: 768px) {
   header h1 {
     font-size: 2rem;
@@ -409,6 +427,11 @@ button[type="submit"]:hover {
 
   #searchBook {
     flex-direction: column;
+  }
+
+  .action-container {
+    flex-direction: row; /* Keep buttons in a row even on mobile */
+    justify-content: flex-end;
   }
 }
 
@@ -503,9 +526,9 @@ footer a:hover {
 }
 
 .theme-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
+  position: relative; /* Change from absolute to relative */
+  top: 0;
+  right: 0;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
   border: 2px solid rgba(255, 255, 255, 0.5);
@@ -608,6 +631,38 @@ body[data-theme="light"] {
   border: 1px solid var(--border-color);
 }
 
+/* Update modal header styles */
+.modal-header {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+/* Update close button styles */
+.close-button {
+  position: absolute;
+  top: -1rem; /* Move up slightly */
+  right: -1rem; /* Move right slightly */
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  font-size: 1.5rem;
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.close-button:hover {
+  background: var(--input-bg);
+  transform: scale(1.1);
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -635,7 +690,7 @@ body[data-theme="light"] {
 }
 
 .btn-add {
-  margin-bottom: 2rem;
+  margin-bottom: 0; /* Remove the bottom margin since container handles spacing */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -685,4 +740,12 @@ body[data-theme="light"] {
 
 body.modal-open {
   overflow: hidden;
+}
+
+.action-container {
+  display: flex;
+  justify-content: space-between; /* Change from flex-end to space-between */
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
