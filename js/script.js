@@ -113,6 +113,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
+  const addBookModal = document.getElementById("addBookModal");
+  const showAddBookBtn = document.getElementById("showAddBook");
+  const closeAddBookBtn = document.getElementById("closeAddBook");
+
+  const openAddBookModal = () => {
+    addBookModal.style.display = "block";
+    document.body.classList.add("modal-open");
+  };
+
+  const closeAddBookModal = () => {
+    addBookModal.style.display = "none";
+    document.body.classList.remove("modal-open");
+  };
+
+  showAddBookBtn.addEventListener("click", openAddBookModal);
+  closeAddBookBtn.addEventListener("click", closeAddBookModal);
+
+  // Close modal when clicking outside
+  window.addEventListener("click", (e) => {
+    if (e.target === addBookModal) {
+      closeAddBookModal();
+    }
+  });
+
   const addBook = (event) => {
     event.preventDefault();
 
@@ -136,6 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
     books.push(newBook);
     saveBooks();
     renderBooks();
+    closeAddBookModal();
     event.target.reset();
     updateSubmitButtonText(false);
   };
