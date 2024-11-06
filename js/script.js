@@ -57,11 +57,20 @@ document.addEventListener("DOMContentLoaded", () => {
     bookElement.setAttribute("data-bookid", book.id);
     bookElement.setAttribute("data-testid", "bookItem");
 
-    bookElement.innerHTML = `
+    // Add cover image if exists
+    if (book.cover) {
+      const coverImg = document.createElement("img");
+      coverImg.src = book.cover;
+      coverImg.className = "book-cover";
+      coverImg.alt = `Cover ${book.title}`;
+      bookElement.appendChild(coverImg);
+    }
+
+    bookElement.innerHTML += `
       <div class="book-content">
         <h3 data-testid="bookItemTitle">${book.title}</h3>
-        <p data-testid="bookItemAuthor">Penulis: ${book.author}</p>
-        <p data-testid="bookItemYear">Tahun: ${book.year}</p>
+        <p data-testid="bookItemAuthor">${book.author}</p>
+        <p data-testid="bookItemYear">${book.year}</p>
       </div>
       <button class="book-menu-toggle">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -106,6 +115,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuToggle.addEventListener("click", (e) => {
       e.stopPropagation();
+      // Close all other open menus first
+      document.querySelectorAll('.book-actions.show').forEach(menu => {
+        if (menu !== actionsMenu) {
+          menu.classList.remove('show');
+        }
+      });
+      // Toggle current menu
       actionsMenu.classList.toggle("show");
     });
 
@@ -125,6 +141,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return bookElement;
   };
+
+  // Add click event listener to document
+  document.addEventListener('click', (e) => {
+    const menus = document.querySelectorAll('.book-actions.show');
+    const menuToggles = document.querySelectorAll('.book-menu-toggle');
+    
+    // Check if click is outside any menu and menu toggle
+    if (!e.target.closest('.book-actions') && !e.target.closest('.book-menu-toggle')) {
+      menus.forEach(menu => menu.classList.remove('show'));
+    }
+  });
 
   const renderBooks = (filteredBooks = books) => {
     incompleteList.innerHTML = "";
@@ -175,21 +202,50 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const isComplete = document.getElementById("bookFormIsComplete").checked;
-
-    const newBook = {
-      id: generateId(),
-      title,
-      author,
-      year,
-      isComplete,
-    };
-
-    books.push(newBook);
-    saveBooks();
-    renderBooks();
-    closeAddBookModal();
-    event.target.reset();
-    updateSubmitButtonText(false);
+    const coverInput = document.getElementById("bookFormCover");
+    
+    // Handle cover image
+    let coverUrl = null;
+    if (coverInput.files && coverInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        coverUrl = e.target.result;
+        // Create and save book after cover is loaded
+        const newBook = {
+          id: generateId(),
+          title,
+          author,
+          year,
+          isComplete,
+          cover: coverUrl
+        };
+        
+        books.push(newBook);
+        saveBooks();
+        renderBooks();
+        closeAddBookModal();
+        event.target.reset();
+        updateSubmitButtonText(false);
+      };
+      reader.readAsDataURL(coverInput.files[0]);
+    } else {
+      // Create book without cover
+      const newBook = {
+        id: generateId(),
+        title,
+        author,
+        year,
+        isComplete,
+        cover: null
+      };
+      
+      books.push(newBook);
+      saveBooks();
+      renderBooks();
+      closeAddBookModal();
+      event.target.reset();
+      updateSubmitButtonText(false);
+    }
   };
 
   const toggleBookComplete = (id) => {
@@ -275,19 +331,42 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleEditFormSubmit = (event) => {
     event.preventDefault();
     const book = books.find(b => b.id === editingBookId);
-    const updatedBook = {
-      id: editingBookId,
-      title: editFormTitle.value,
-      author: editFormAuthor.value,
-      year: parseInt(editFormYear.value),
-      isComplete: book.isComplete // Gunakan status sebelumnya
-    };
-    books = books.map((book) =>
-      book.id === editingBookId ? updatedBook : book
-    );
-    saveBooks();
-    renderBooks();
-    hideEditForm();
+    const coverInput = document.getElementById("editFormCover");
+    
+    if (coverInput.files && coverInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const updatedBook = {
+          ...book,
+          title: editFormTitle.value,
+          author: editFormAuthor.value,
+          year: parseInt(editFormYear.value),
+          cover: e.target.result
+        };
+        
+        books = books.map((b) =>
+          b.id === editingBookId ? updatedBook : b
+        );
+        saveBooks();
+        renderBooks();
+        hideEditForm();
+      };
+      reader.readAsDataURL(coverInput.files[0]);
+    } else {
+      const updatedBook = {
+        ...book,
+        title: editFormTitle.value,
+        author: editFormAuthor.value,
+        year: parseInt(editFormYear.value)
+      };
+      
+      books = books.map((b) =>
+        b.id === editingBookId ? updatedBook : b
+      );
+      saveBooks();
+      renderBooks();
+      hideEditForm();
+    }
   };
 
   const handleEditFormCancel = (event) => {

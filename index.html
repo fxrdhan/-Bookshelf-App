@@ -45,6 +45,15 @@
           </div>
           <form id="bookForm" data-testid="bookForm">
             <div class="form-group">
+              <label for="bookFormCover">Sampul Buku</label>
+              <input
+                id="bookFormCover"
+                type="file"
+                accept="image/*"
+                data-testid="bookFormCoverInput" />
+              <small class="form-hint">Rekomendasi: Gambar dengan rasio 6:9</small>
+            </div>
+            <div class="form-group">
               <label for="bookFormTitle">Judul</label>
               <input
                 id="bookFormTitle"
@@ -121,6 +130,15 @@
             <button class="close-button" id="closeEditBook">&times;</button>
           </div>
           <form id="editForm" data-testid="editForm">
+            <div class="form-group">
+              <label for="editFormCover">Sampul Buku</label>
+              <input
+                id="editFormCover"
+                type="file"
+                accept="image/*"
+                data-testid="editFormCoverInput" />
+              <small class="form-hint">Rekomendasi: Gambar dengan rasio 6:9</small>
+            </div>
             <div class="form-group">
               <label for="editFormTitle">Judul</label>
               <input

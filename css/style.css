@@ -308,6 +308,8 @@ button[type="submit"]:hover {
 }
 
 .book-item {
+  display: flex;
+  gap: 1rem;
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
@@ -315,6 +317,7 @@ button[type="submit"]:hover {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .book-item::before {
@@ -343,6 +346,14 @@ button[type="submit"]:hover {
   transform: scaleX(1);
 }
 
+.book-cover {
+  width: 150px; /* 6 inches at 96dpi */
+  height: 225px; /* 9 inches at 96dpi */
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .book-item h3 {
   color: var(--text-color);
   margin-bottom: 0.5rem;
@@ -354,26 +365,69 @@ button[type="submit"]:hover {
   margin-bottom: 0.5rem;
 }
 
+.book-content {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
 .book-actions {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
   flex-wrap: wrap;
+  position: absolute;
+  bottom: 3rem;  /* Changed from top to bottom */
+  right: 0.5rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: none;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 160px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 3;
 }
 
-.btn-complete {
-  background: var(--success-color);
-  color: white;
+.book-actions.show {
+  display: flex;
 }
 
-.btn-delete {
-  background: var(--danger-color);
-  color: white;
+.book-actions button {
+  width: 100%;
+  padding: 0.5rem;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
-.btn-edit {
-  background: var(--warning-color);
-  color: white;
+.book-actions button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.book-actions button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.book-actions .btn-complete {
+  color: var (--success-color);
+}
+
+.book-actions .btn-edit {
+  color: var(--warning-color);
+}
+
+.book-actions .btn-delete {
+  color: var(--danger-color);
 }
 
 #searchBook {
@@ -435,6 +489,17 @@ button[type="submit"]:hover {
   }
 }
 
+@media (max-width: 480px) {
+  .book-item {
+    flex-direction: column;
+  }
+  
+  .book-cover {
+    width: 100%;
+    height: 300px;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -445,10 +510,6 @@ button[type="submit"]:hover {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.book-item {
-  animation: fadeIn 0.3s ease-out;
 }
 
 .edit-form {
@@ -830,7 +891,7 @@ body.modal-open {
 
 .book-menu-toggle {
   position: absolute;
-  top: 0.75rem;
+  bottom: 0.75rem;
   right: 0.75rem;
   padding: 0.5rem;
   background: none;
@@ -839,86 +900,73 @@ body.modal-open {
   cursor: pointer;
   z-index: 2;
   opacity: 0.7;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;  /* Added transform to transition */
   border-radius: 50%;
+  transform: rotate(90deg);  /* Added rotation */
 }
 
 .book-menu-toggle:hover {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.book-actions {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 0.5rem;
-  display: none;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 160px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 3;
-}
-
-.book-actions.show {
-  display: flex;
-}
-
-.book-actions button {
-  width: 100%;
-  padding: 0.5rem;
-  text-align: left;
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.book-actions button:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.book-actions button svg {
-  width: 16px;
-  height: 16px;
-}
-
-.book-actions .btn-complete {
-  color: var (--success-color);
-}
-
-.book-actions .btn-edit {
-  color: var(--warning-color);
-}
-
-.book-actions .btn-delete {
-  color: var(--danger-color);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  transform: rotate(90deg) scale(1.1);  /* Keep rotation while scaling on hover */
 }
 
 /* Add space between last form group and buttons */
 #editForm .form-group:last-of-type {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Add space between buttons */
-#editForm button + button {
-  margin-top: 0.5rem;
+.form-hint {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Add these new styles for file input */
+input[type="file"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]:hover {
+  border-color: var(--primary-color);
+  background: var(--surface-color);
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* For Firefox */
+input[type="file"]::-moz-file-upload-button {
+  background: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]::-moz-file-upload-button:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
 }
