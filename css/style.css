@@ -1,11 +1,11 @@
-*,
-*::before,
-*::after {
+/* Combine box-sizing, margin, and padding for all elements */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Consolidate :root and :root[data-theme="light"] variables */
 :root {
   --primary-color: #6d28d9;
   --primary-light: #a78bfa;
@@ -24,16 +24,12 @@
   --input-text: #f8fafc;
   --gradient-start: #1e1b4b;
   --gradient-end: #0f172a;
+  --surface-color-rgb: 30, 41, 59; /* This is the RGB value for #1e293b */
 }
 
 :root[data-theme="light"] {
-  --primary-color: #6d28d9;
   --primary-light: #D4BEE4;
-  --primary-dark: #5b21b6;
   --secondary-color: #64748b;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --warning-color: #f59e0b;
   --background-color: #f8fafc;
   --surface-color: #ffffff;
   --text-color: #1e293b;
@@ -44,61 +40,126 @@
   --input-text: #1e293b;
   --gradient-start: #f1f5f9;
   --gradient-end: #e2e8f0;
+  --surface-color-rgb: 255, 255, 255; /* This is the RGB value for #ffffff */
 }
 
+/* Use shorthand for font and background properties */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
+  font: 1rem -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.6;
   color: var(--text-color);
-  background: linear-gradient(
-    135deg,
-    var(--gradient-start) 0%,
-    var(--gradient-end) 100%
-  );
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
   min-height: 100vh;
+  display: flex; /* Add this */
+  flex-direction: column; /* Add this */
+  margin: 0; /* Ensure no margin */
 }
 
 header {
-  background: linear-gradient(to right, #4c1d95, #6d28d9);
+  background: linear-gradient(
+    270deg,
+    #4c1d95,
+    #6d28d9,
+    #7c3aed,
+    #6d28d9,
+    #4c1d95
+  );
+  background-size: 300% 100%;
+  animation: gradientShift 10s ease infinite;
   color: white;
-  padding: 2rem 1rem;
+  padding: 3rem 1rem;
   text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-bottom-left-radius: 25px;  /* Add this line */
+  border-bottom-right-radius: 25px; /* Add this line */
 }
 
+/* Remove wave effect */
 header::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  background: none;
+}
+
+/* Add pattern overlay */
+header::after {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(139, 92, 246, 0.1) 0%,
-    rgba(167, 139, 250, 0.1) 100%
-  );
+  opacity: 0.1;
   z-index: 1;
 }
 
 header h1 {
   position: relative;
   z-index: 2;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+  animation: titleFloat 3s ease-in-out infinite;
 }
 
-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
+/* Add floating animation */
+@keyframes titleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Enhance responsive design */
+@media (max-width: 768px) {
+  header {
+    padding: 2rem 1rem;
+  }
+
+  header h1 {
+    font-size: 2.5rem;
+  }
+
+  header::before {
+    height: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 1.5rem 1rem;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+
+  header::before {
+    height: 20px;
+  }
 }
 
 main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  flex: 1; /* Add this to make main take remaining space */
+  width: 100%; /* Add this to ensure full width */
 }
 
 section.card {
@@ -220,15 +281,70 @@ input::placeholder {
   animation: checkmark 0.2s ease-in-out;
 }
 
+/* Restore separate @keyframes declarations */
 @keyframes checkmark {
   0% {
     opacity: 0;
     transform: rotate(45deg) scale(0);
   }
-
   100% {
     opacity: 1;
     transform: rotate(45deg) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes liftUp {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes liftDown {
+  0% {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes buttonFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -236,17 +352,19 @@ input::placeholder {
   box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.2);
 }
 
-button {
+/* Group similar button styles */
+button, .btn-save, .btn-cancel, .view-all-button, .btn-add {
   padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 8px;
-  font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
   background: var(--primary-color);
   color: white;
+  font-family: inherit; /* Add this to inherit from body */
+  font-weight: 600; /* Make buttons semi-bold by default */
 }
 
 button::before {
@@ -274,7 +392,8 @@ button[type="submit"] {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-button[type="submit"]:hover {
+/* Merge hover and active states where possible */
+button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn-add:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
 }
@@ -285,28 +404,69 @@ button[type="submit"]:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-.btn-save:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
-}
-
 .btn-cancel {
   background: var(--danger-color) !important;
   color: white;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-.btn-cancel:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.3);
-}
-
 .book-grid {
   display: grid;
   gap: 1.5rem;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  position: relative;
+  max-height: none; /* Remove default max-height */
+  overflow: visible; /* Change from hidden to visible */
+  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother easing */
 }
 
+.book-grid.collapsed {
+  max-height: 420px; /* Increased from 400px to accommodate full items */
+  overflow: hidden; /* Add overflow hidden only when collapsed */
+}
+
+.book-grid.collapsed::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100px; /* Reduced gradient height */
+  background: linear-gradient(to bottom, 
+    rgba(var(--surface-color-rgb), 0) 0%,
+    var(--surface-color) 100%);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.3s ease; /* Fade effect for gradient */
+}
+
+.book-grid:not(.collapsed)::after {
+  opacity: 0;
+}
+
+/* View All button styles */
+.view-all-button {
+  display: none;
+  margin: 2rem auto; /* Increased margin */
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform-origin: center;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.view-all-button.visible {
+  display: block;
+  animation: buttonFadeIn 0.3s ease forwards;
+}
+
+/* Add transition for book items visibility */
 .book-item {
   display: flex;
   gap: 1rem;
@@ -314,36 +474,119 @@ button[type="submit"]:hover {
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1.5rem;
-  transition: all 0.3s ease;
+  transition: opacity 0.3s ease; /* Remove transform transition */
   position: relative;
   overflow: hidden;
   animation: fadeIn 0.3s ease-out;
-}
-
-.book-item::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(
-    to right,
-    var(--primary-color),
-    var(--primary-dark)
-  );
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
+  transform-origin: center;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .book-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-  border-color: var(--primary-color);
+  transform: none; /* Remove translateY */
+  box-shadow: none; /* Remove box-shadow change */
 }
 
-.book-item:hover::before {
-  transform: scaleX(1);
+.book-item:active {
+  transform: none; /* Remove translateY */
+  box-shadow: none; /* Remove box-shadow change */
+  transition: none; /* Remove transition */
+}
+
+.book-grid.collapsed .book-item:nth-child(n+4) {
+  opacity: 0.5; /* Set opacity to 0.5 instead of 0 */
+  transform: scale(0.95); /* Scale down slightly instead of translateY */
+  pointer-events: none; /* Prevent interaction */
+}
+
+/* Add new keyframes for lift animation */
+@keyframes liftUp {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes liftDown {
+  0% {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Ubah penerapan blur ke konten spesifik */
+.book-item.menu-open .book-cover,
+.book-item.menu-open .book-content {
+  filter: brightness(50%) blur(4px); /* Increase blur to 4px and darken */
+}
+
+/* Reset styling untuk menu dan toggle button */
+.book-menu-toggle {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  z-index: 5;
+  opacity: 0.7;
+  border-radius: 50%;
+  isolation: isolate; /* Add this to create a new stacking context */
+}
+
+.book-menu-toggle:hover {
+  isolation: isolate; /* Add this to create a new stacking context */
+}
+
+/* Refactor book-actions to center over the cover without a box */
+.book-actions {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: none; /* Remove background */
+  border: none;     /* Remove border */
+  box-shadow: none; /* Remove box-shadow */
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Show book-actions when menu is open */
+.book-actions.show {
+  display: flex;
+}
+
+/* Apply blur to book cover when menu is open */
+.book-item.menu-open .book-cover {
+  filter: brightness(50%) blur(4px);
+}
+
+/* Style menu buttons without box */
+.book-actions button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.book-actions button:hover {
+  background: var(--primary-dark);
 }
 
 .book-cover {
@@ -368,30 +611,6 @@ button[type="submit"]:hover {
 .book-content {
   flex: 1;
   padding-right: 2.5rem;
-}
-
-.book-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-  position: absolute;
-  bottom: 3rem;  /* Changed from top to bottom */
-  right: 0.5rem;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 0.5rem;
-  display: none;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 160px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 3;
-}
-
-.book-actions.show {
-  display: flex;
 }
 
 .book-actions button {
@@ -458,7 +677,8 @@ button[type="submit"]:hover {
   background: var(--surface-color);
 }
 
-@media (max-width: 768px) {
+/* Simplify media queries by combining selectors */
+@media (max-width: 768px), (max-width: 480px) {
   header h1 {
     font-size: 2rem;
   }
@@ -469,10 +689,36 @@ button[type="submit"]:hover {
 
   .book-grid {
     grid-template-columns: 1fr;
+    gap: 1rem; /* Reduced gap between items */
+  }
+
+  .book-item {
+    padding: 1rem; /* Reduced padding */
+    gap: 0.75rem; /* Reduced gap between cover and content */
+  }
+
+  .book-cover {
+    width: 120px; /* Smaller cover width */
+    height: 170px; /* Smaller cover height */
+  }
+
+  .book-content {
+    padding-right: 2rem; /* Reduced padding */
+  }
+
+  .book-item h3 {
+    font-size: 1.1rem; /* Smaller title */
+    margin-bottom: 0.25rem;
+  }
+
+  .book-item p {
+    font-size: 0.9rem; /* Smaller text */
+    margin-bottom: 0.25rem;
   }
 
   .book-actions {
     flex-direction: column;
+    left: 60%;
   }
 
   .book-actions button {
@@ -487,28 +733,52 @@ button[type="submit"]:hover {
     flex-direction: row; /* Keep buttons in a row even on mobile */
     justify-content: flex-end;
   }
-}
 
-@media (max-width: 480px) {
   .book-item {
-    flex-direction: column;
+    flex-direction: row; /* Keep horizontal layout even on smallest screens */
   }
   
   .book-cover {
-    width: 100%;
-    height: 300px;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+    width: 80px; /* Even smaller cover for very small screens */
+    height: 120px;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .book-actions {
+    min-width: 140px; /* Smaller menu width */
+    bottom: -0.5rem; /* Align to the bottom edge */
+    right: 0.75rem; /* Align to the right edge */
+  }
+
+  .book-actions button {
+    padding: 0.35rem 0.5rem; /* Smaller padding for menu items */
+    font-size: 0.85rem; /* Smaller font */
+  }
+
+  /* Add these new styles for footer */
+  footer {
+    padding: 0.75rem;
+  }
+
+  footer p {
+    font-size: 0.85rem; /* Smaller text size */
+  }
+
+  footer a {
+    font-size: 0.85rem; /* Match link size with text */
+  }
+
+  /* Adjust blur condition for grid view */
+  .book-grid.grid-view.collapsed .book-item:nth-child(n+3) {
+    opacity: 0.5;
+    transform: scale(0.95);
+    pointer-events: none;
+  }
+
+  /* Adjust blur condition for cover-view mode */
+  .book-grid.cover-view.collapsed .book-item:nth-child(n+3) {
+    opacity: 0.5;
+    transform: scale(0.95);
+    pointer-events: none;
   }
 }
 
@@ -565,6 +835,7 @@ footer {
   text-align: center;
   padding: 1rem;
   border-top: 1px solid var(--border-color);
+  margin-top: auto; /* Remove this if exists */
 }
 
 footer a {
@@ -706,7 +977,7 @@ body[data-theme="light"] {
   font-size: 1.5rem;
   color: var(--text-color);
   cursor: pointer;
-  padding: 0.5rem;
+  padding: 0;  /* Changed from 0.5rem to 0 */
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -715,158 +986,21 @@ body[data-theme="light"] {
   justify-content: center;
   transition: all 0.2s ease;
   z-index: 1;
+  line-height: 0;  /* Added to help with vertical centering */
+}
+
+.close-button span {
+  display: flex;          /* Added to center the × symbol */
+  align-items: center;    /* Added to center the × symbol */
+  justify-content: center;/* Added to center the × symbol */
+  width: 100%;           /* Added to ensure full width */
+  height: 100%;          /* Added to ensure full height */
+  margin-bottom: 2px;    /* Optional: fine-tune vertical position */
 }
 
 .close-button:hover {
   background: var(--input-bg);
   transform: scale(1.1);
-}
-
-@keyframes modalSlideIn {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-body.modal-open {
-  overflow: hidden;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
-  backdrop-filter: blur(5px);
-}
-
-.modal-content {
-  position: relative;
-  background: var(--surface-color);
-  margin: 2rem auto;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 600px;
-  animation: modalSlideIn 0.3s ease-out;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-color);
-}
-
-/* Update modal header styles */
-.modal-header {
-  position: relative;
-  margin-bottom: 1.5rem;
-}
-
-/* Update close button styles */
-.close-button {
-  position: absolute;
-  top: -1rem; /* Move up slightly */
-  right: -1rem; /* Move right slightly */
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  font-size: 1.5rem;
-  color: var(--text-color);
-  cursor: pointer;
-  padding: 0.5rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  z-index: 1;
-}
-
-.close-button:hover {
-  background: var(--input-bg);
-  transform: scale(1.1);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: var(--text-color);
-  cursor: pointer;
-  padding: 0.5rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.close-button:hover {
-  background: var(--input-bg);
-}
-
-.btn-add {
-  margin-bottom: 0; /* Remove the bottom margin since container handles spacing */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3);
-  border-radius: 12px;
-  width: auto;
-  min-width: 200px;
-}
-
-.btn-add:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.4);
-  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-}
-
-.btn-add:active {
-  transform: translateY(1px);
-  box-shadow: 0 2px 10px rgba(109, 40, 217, 0.3);
-}
-
-.btn-add svg {
-  width: 20px;
-  height: 20px;
-  transition: transform 0.3s ease;
-}
-
-.btn-add:hover svg {
-  transform: rotate(90deg);
-}
-
-@keyframes modalSlideIn {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
 }
 
 body.modal-open {
@@ -900,14 +1034,12 @@ body.modal-open {
   cursor: pointer;
   z-index: 2;
   opacity: 0.7;
-  transition: opacity 0.3s ease, transform 0.3s ease;  /* Added transform to transition */
   border-radius: 50%;
-  transform: rotate(90deg);  /* Added rotation */
+  isolation: isolate; /* Add this to create a new stacking context */
 }
 
 .book-menu-toggle:hover {
-  opacity: 1;
-  transform: rotate(90deg) scale(1.1);  /* Keep rotation while scaling on hover */
+  isolation: isolate; /* Add this to create a new stacking context */
 }
 
 /* Add space between last form group and buttons */
@@ -969,4 +1101,276 @@ input[type="file"]::-moz-file-upload-button {
 input[type="file"]::-moz-file-upload-button:hover {
   background: var(--primary-dark);
   transform: translateY(-1px);
+}
+
+/* ...existing code... */
+
+.btn-add {
+  font-size: 1rem; /* Adjust from 1.1rem to match better with headings */
+  font-weight: 700; /* Make it bold like the heading */
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase; /* Add this to match heading style */
+  letter-spacing: 0.5px; /* Add subtle letter spacing */
+}
+
+.btn-add svg {
+  width: 20px;
+  height: 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(109, 40, 217, 0.4);
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+}
+
+.btn-add:hover svg {
+  transform: rotate(90deg);
+}
+
+.btn-add:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 10px rgba(109, 40, 217, 0.3);
+}
+
+.btn-add::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+    opacity: 0.8;
+  }
+  20% {
+    left: 100%;
+    opacity: 0.8;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+/* Tambahkan pulse effect pada button */
+.btn-add::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+
+.btn-add:hover::after {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* ...existing code... */
+
+/* Disable transitions for the book menu toggle */
+.book-menu-toggle,
+.book-menu-toggle * {
+  transition: none;
+}
+
+/* Disable transitions for buttons within book actions */
+.book-actions button {
+  transition: none;
+}
+
+/* Remove hover transformations for the book menu toggle */
+.book-menu-toggle:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Remove hover transformations for buttons within book actions */
+.book-actions button:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Add this new keyframe animation */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ...existing code... */
+
+/* View mode toggle styles */
+.view-controls {
+  display: flex;
+  align-items: center;
+}
+
+.view-mode-toggle {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-mode-toggle svg {
+  width: 20px;
+  height: 20px;
+  color: var(--text-color);
+}
+
+.view-mode-toggle .grid-view-icon {
+  display: none;
+}
+
+.view-mode-toggle.grid .list-view-icon {
+  display: none;
+}
+
+.view-mode-toggle.grid .grid-view-icon {
+  display: block;
+}
+
+/* Grid view styles */
+.book-grid.grid-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Increased min-width */
+  gap: 1rem; /* Reduced gap */
+}
+
+/* Media query adjustments */
+@media (max-width: 768px) {
+  .book-grid.grid-view .book-item {
+    gap: 1rem; /* Reduced gap for mobile */
+  }
+}
+
+/* Cover-only view styles */
+.book-grid.cover-view {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.book-grid.cover-view .book-item {
+  flex-direction: column;
+  padding: 0;
+  position: relative;
+  aspect-ratio: 2/3;
+}
+
+.book-grid.cover-view .book-cover {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border-radius: 8px;
+}
+
+.book-grid.cover-view .book-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 0.75rem 0.75rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  border-radius: 0 0 8px 8px;
+  color: white;
+}
+
+.book-grid.cover-view .book-content h3 {
+  color: white;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.book-grid.cover-view .book-content p {
+  display: none;
+}
+
+/* Media query adjustments */
+@media (max-width: 768px) {
+  .book-grid.grid-view,
+  .book-grid.cover-view {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+
+  .book-grid.grid-view {
+    grid-template-columns: 1fr;
+  }
+
+  .book-grid.grid-view .book-item {
+    padding: 0.75rem;
+  }
+
+  .book-grid.grid-view .book-cover {
+    width: 80px;
+    height: 120px;
+  }
+}
+
+/* Media query adjustments */
+@media (min-width: 769px) {
+  .book-grid.collapsed {
+    max-height: 840px; /* Adjusted for six items */
+  }
+}
+
+/* Position book menu toggle at top right for grid and cover-only views */
+.book-grid.grid-view .book-menu-toggle,
+.book-grid.cover-view .book-menu-toggle {
+  top: 0.75rem;
+  right: 0.75rem;
+  bottom: auto;
 }

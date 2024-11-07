@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const themeToggle = document.getElementById("themeToggle");
   const sunIcon = themeToggle.querySelector(".sun-icon");
   const moonIcon = themeToggle.querySelector(".moon-icon");
@@ -24,7 +24,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setTheme(currentTheme === "light" ? "dark" : "light");
   });
 
-  let books = JSON.parse(localStorage.getItem("books")) || [];
+  let books = [];
+
+  if (!localStorage.getItem("books")) {
+    books = []; // Initialize with an empty array
+  } else {
+    books = JSON.parse(localStorage.getItem("books"));
+  }
 
   const bookForm = document.getElementById("bookForm");
   const searchInput = document.getElementById("searchBookTitle");
@@ -33,17 +39,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const isCompleteCheckbox = document.getElementById("bookFormIsComplete");
   const submitButton = document.getElementById("bookFormSubmit");
 
-  const updateSubmitButtonText = (isChecked) => {
-    submitButton.innerHTML = `Masukkan Buku ke rak <span>${
-      isChecked ? "Selesai dibaca" : "Belum selesai dibaca"
-    }</span>`;
+  const updateSubmitButton = () => {
+    const isChecked = isCompleteCheckbox.checked;
+    submitButton.innerHTML = isChecked
+      ? 'Masukkan Buku ke rak <span>Selesai dibaca</span>'
+      : 'Masukkan Buku ke rak <span>Belum selesai dibaca</span>';
   };
 
-  isCompleteCheckbox.addEventListener("change", (e) => {
-    updateSubmitButtonText(e.target.checked);
-  });
-
-  updateSubmitButtonText(isCompleteCheckbox.checked);
+  isCompleteCheckbox.addEventListener("change", updateSubmitButton);
+  updateSubmitButton();
 
   const generateId = () => Date.now().toString();
 
@@ -57,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
     bookElement.setAttribute("data-bookid", book.id);
     bookElement.setAttribute("data-testid", "bookItem");
 
-    // Add cover image if exists
     if (book.cover) {
       const coverImg = document.createElement("img");
       coverImg.src = book.cover;
@@ -79,16 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </button>
       <div class="book-actions">
         <button class="btn-complete" data-testid="bookItemIsCompleteButton">
-        ${book.isComplete ? 
-        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M10.854 5.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 7.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
-          <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1z"/>
-        </svg>` :
-        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmark-check-fill" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M2 15.5V2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5m8.854-9.646a.5.5 0 0 0-.708-.708L7.5 7.793 6.354 6.646a.5.5 0 1 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0z"/>
-        </svg>`
-        }
-          ${book.isComplete ? "Belum selesai dibaca" : "Selesai dibaca"}
+        ${book.isComplete ? "Belum selesai dibaca" : "Selesai dibaca"}
         </button>
         <button class="btn-edit" data-testid="bookItemEditButton">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -115,47 +109,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     menuToggle.addEventListener("click", (e) => {
       e.stopPropagation();
-      // Close all other open menus first
-      document.querySelectorAll('.book-actions.show').forEach(menu => {
-        if (menu !== actionsMenu) {
-          menu.classList.remove('show');
+      document.querySelectorAll('.book-item').forEach(item => {
+        if (item !== bookElement) {
+          item.classList.remove('menu-open');
+          item.querySelector('.book-actions')?.classList.remove('show');
         }
       });
-      // Toggle current menu
       actionsMenu.classList.toggle("show");
+      bookElement.classList.toggle("menu-open");
     });
 
     completeButton.onclick = () => {
       actionsMenu.classList.remove("show");
+      bookElement.classList.remove("menu-open");
       toggleBookComplete(book.id);
     };
     deleteButton.onclick = () => {
       actionsMenu.classList.remove("show");
+      bookElement.classList.remove("menu-open");
       deleteBook(book.id);
     };
     editButton.onclick = (e) => {
-      e.stopPropagation(); // Hentikan event bubbling
+      e.stopPropagation();
       actionsMenu.classList.remove("show");
-      editBook(book.id); // Langsung panggil editBook dengan book.id
+      bookElement.classList.remove("menu-open");
+      editBook(book.id);
     };
 
     return bookElement;
   };
 
-  // Add click event listener to document
   document.addEventListener('click', (e) => {
     const menus = document.querySelectorAll('.book-actions.show');
     const menuToggles = document.querySelectorAll('.book-menu-toggle');
     
-    // Check if click is outside any menu and menu toggle
     if (!e.target.closest('.book-actions') && !e.target.closest('.book-menu-toggle')) {
-      menus.forEach(menu => menu.classList.remove('show'));
+      menus.forEach(menu => {
+        menu.classList.remove('show');
+        menu.closest('.book-item').classList.remove('menu-open');
+      });
     }
   });
 
   const renderBooks = (filteredBooks = books) => {
     incompleteList.innerHTML = "";
     completeList.innerHTML = "";
+
+    document.querySelectorAll('.view-all-button').forEach(button => button.remove());
+
+    function createViewAllButton() {
+        const button = document.createElement("button");
+        button.className = "view-all-button";
+        button.textContent = "Lihat Semua";
+        return button;
+    }
+    
+    const incompleteViewAll = createViewAllButton();
+    const completeViewAll = createViewAllButton();
 
     filteredBooks.forEach((book) => {
       const bookElement = createBookElement(book);
@@ -165,29 +175,58 @@ document.addEventListener("DOMContentLoaded", () => {
         incompleteList.appendChild(bookElement);
       }
     });
+
+    const applyCollapse = (list, button) => {
+      const isDesktop = window.innerWidth >= 769;
+      const threshold = isDesktop ? 6 : 3;
+      if (list.children.length > threshold) {
+        list.classList.add('collapsed');
+        button.classList.add('visible');
+        list.parentElement.appendChild(button);
+
+        button.addEventListener('click', () => {
+          list.classList.toggle('collapsed');
+          button.textContent = list.classList.contains('collapsed') ? 'Lihat Semua' : 'Lihat Sedikit';
+        });
+      } else {
+        list.classList.remove('collapsed');
+      }
+    };
+
+    applyCollapse(incompleteList, incompleteViewAll);
+    applyCollapse(completeList, completeViewAll);
+
+    // Reapply current view mode after rendering
+    const currentViewMode = localStorage.getItem('viewMode') || 'grid';
+    setViewMode(currentViewMode);
   };
+
+  // Add event listener to refresh page on dimension change
+  let lastWidth = window.innerWidth;
+  window.addEventListener('resize', () => {
+    const currentWidth = window.innerWidth;
+    const isDesktop = currentWidth >= 769;
+    const wasDesktop = lastWidth >= 769;
+    if (isDesktop !== wasDesktop) {
+      location.reload();
+    }
+    lastWidth = currentWidth;
+  });
 
   const addBookModal = document.getElementById("addBookModal");
   const showAddBookBtn = document.getElementById("showAddBook");
   const closeAddBookBtn = document.getElementById("closeAddBook");
 
-  const openAddBookModal = () => {
-    addBookModal.style.display = "block";
-    document.body.classList.add("modal-open");
+  const toggleAddBookModal = () => {
+    addBookModal.style.display = addBookModal.style.display === "block" ? "none" : "block";
   };
 
-  const closeAddBookModal = () => {
-    addBookModal.style.display = "none";
-    document.body.classList.remove("modal-open");
-  };
+  showAddBookBtn.addEventListener("click", toggleAddBookModal);
+  closeAddBookBtn.addEventListener("click", toggleAddBookModal);
 
-  showAddBookBtn.addEventListener("click", openAddBookModal);
-  closeAddBookBtn.addEventListener("click", closeAddBookModal);
-
-  // Close modal when clicking outside
   window.addEventListener("click", (e) => {
     if (e.target === addBookModal) {
-      closeAddBookModal();
+      toggleAddBookModal();
     }
   });
 
@@ -204,13 +243,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const isComplete = document.getElementById("bookFormIsComplete").checked;
     const coverInput = document.getElementById("bookFormCover");
     
-    // Handle cover image
     let coverUrl = null;
     if (coverInput.files && coverInput.files[0]) {
       const reader = new FileReader();
       reader.onload = (e) => {
         coverUrl = e.target.result;
-        // Create and save book after cover is loaded
         const newBook = {
           id: generateId(),
           title,
@@ -223,13 +260,12 @@ document.addEventListener("DOMContentLoaded", () => {
         books.push(newBook);
         saveBooks();
         renderBooks();
-        closeAddBookModal();
+        toggleAddBookModal();
         event.target.reset();
-        updateSubmitButtonText(false);
+        updateSubmitButton(false);
       };
       reader.readAsDataURL(coverInput.files[0]);
     } else {
-      // Create book without cover
       const newBook = {
         id: generateId(),
         title,
@@ -242,9 +278,9 @@ document.addEventListener("DOMContentLoaded", () => {
       books.push(newBook);
       saveBooks();
       renderBooks();
-      closeAddBookModal();
+      toggleAddBookModal();
       event.target.reset();
-      updateSubmitButtonText(false);
+      updateSubmitButton(false);
     }
   };
 
@@ -308,7 +344,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   closeEditBookBtn.addEventListener("click", closeEditBookModal);
 
-  // Close modal when clicking outside
   window.addEventListener("click", (e) => {
     if (e.target === editBookModal) {
       closeEditBookModal();
@@ -380,6 +415,27 @@ document.addEventListener("DOMContentLoaded", () => {
     .addEventListener("click", handleEditFormCancel);
 
   bookForm.addEventListener("submit", addBook);
+
+  const viewModeToggle = document.getElementById("viewModeToggle");
+  
+  const setViewMode = (mode) => {
+    const bookGrids = document.querySelectorAll('.book-grid');
+    bookGrids.forEach(grid => {
+      grid.classList.remove('grid-view', 'cover-view');
+      grid.classList.add(`${mode}-view`);
+    });
+    viewModeToggle.classList.toggle('grid', mode === 'cover');
+    localStorage.setItem('viewMode', mode);
+  };
+
+  viewModeToggle.addEventListener('click', () => {
+    const currentMode = localStorage.getItem('viewMode') || 'grid';
+    setViewMode(currentMode === 'grid' ? 'cover' : 'grid');
+  });
+
+  // Initialize view mode from localStorage
+  const savedViewMode = localStorage.getItem('viewMode') || 'grid';
+  setViewMode(savedViewMode);
 
   renderBooks();
 });
