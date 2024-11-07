@@ -26,10 +26,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let books = [];
 
-  if (!localStorage.getItem("books")) {
-    books = []; // Initialize with an empty array
-  } else {
-    books = JSON.parse(localStorage.getItem("books"));
+  // Retrieve books from localStorage
+  const storedBooks = localStorage.getItem("books");
+
+  try {
+    books = storedBooks ? JSON.parse(storedBooks) : [];
+  } catch (error) {
+    console.error("Error parsing books from localStorage:", error);
+    books = [];
+  }
+
+  // Check if books array is empty or invalid
+  if (!Array.isArray(books) || books.length === 0) {
+    books = defaultBooks; // Use default books from bookData.js
+    localStorage.setItem("books", JSON.stringify(books)); // Save to localStorage
   }
 
   const bookForm = document.getElementById("bookForm");
@@ -152,16 +162,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   const renderBooks = (filteredBooks = books) => {
+    const currentViewMode = localStorage.getItem('viewMode') || 'grid';
+    const bookGrids = document.querySelectorAll('.book-grid');
+    const currentGridClasses = Array.from(bookGrids[0]?.classList || [])
+      .filter(className => className.includes('-view'));
+
     incompleteList.innerHTML = "";
     completeList.innerHTML = "";
 
     document.querySelectorAll('.view-all-button').forEach(button => button.remove());
 
     function createViewAllButton() {
-        const button = document.createElement("button");
-        button.className = "view-all-button";
-        button.textContent = "Lihat Semua";
-        return button;
+      const button = document.createElement("button");
+      button.className = "view-all-button";
+      button.textContent = "Lihat Semua";
+      return button;
     }
     
     const incompleteViewAll = createViewAllButton();
@@ -196,12 +211,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     applyCollapse(incompleteList, incompleteViewAll);
     applyCollapse(completeList, completeViewAll);
 
-    // Reapply current view mode after rendering
-    const currentViewMode = localStorage.getItem('viewMode') || 'grid';
-    setViewMode(currentViewMode);
+    const newBookGrids = document.querySelectorAll('.book-grid');
+    newBookGrids.forEach(grid => {
+      grid.classList.remove('grid-view', 'cover-view');
+      grid.classList.add(`${currentViewMode}-view`);
+    });
+
+    const viewModeToggle = document.getElementById('viewModeToggle');
+    viewModeToggle.classList.toggle('grid', currentViewMode === 'cover');
+
+    const bookCovers = document.querySelectorAll('.book-cover');
+    bookCovers.forEach(cover => {
+      cover.addEventListener('click', openImageModal);
+    });
   };
 
-  // Add event listener to refresh page on dimension change
   let lastWidth = window.innerWidth;
   window.addEventListener('resize', () => {
     const currentWidth = window.innerWidth;
@@ -433,9 +457,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     setViewMode(currentMode === 'grid' ? 'cover' : 'grid');
   });
 
-  // Initialize view mode from localStorage
   const savedViewMode = localStorage.getItem('viewMode') || 'grid';
   setViewMode(savedViewMode);
 
   renderBooks();
+});
+
+function openImageModal(event) {
+  const bookCover = event.currentTarget;
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalBookCover');
+  
+  modalImage.src = bookCover.src;
+  modal.style.display = 'block';
+  document.body.classList.add('modal-open');
+}
+
+function closeImageModal() {
+  const modal = document.getElementById('imageModal');
+  modal.style.display = 'none';
+  document.body.classList.remove('modal-open');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const closeImageModalButton = document.getElementById('closeImageModal');
+  if (closeImageModalButton) {
+    closeImageModalButton.addEventListener('click', closeImageModal);
+  }
+
+  const imageModal = document.getElementById('imageModal');
+  if (imageModal) {
+    imageModal.addEventListener('click', function(event) {
+      if (event.target === imageModal) {
+        closeImageModal();
+      }
+    });
+  }
 });

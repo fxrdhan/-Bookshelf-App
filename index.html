@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bookshelf App</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="js/bookData.js" defer></script>
     <script src="js/script.js" defer></script>
   </head>
   <body>
@@ -112,32 +113,42 @@
         </div>
       </section>
       <section class="card">
-        <h2>Cari Buku</h2>
         <div class="search-container">
           <input
             id="searchBookTitle"
             type="text"
             placeholder="Cari judul buku..."
             data-testid="searchBookFormTitleInput" />
+          <button class="search-button" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            </svg>
+          </button>
         </div>
       </section>
       <section class="card">
         <h2>Belum selesai dibaca</h2>
         <div id="incompleteBookList" class="book-grid">
-          <div class="book-actions">
-            <button class="book-menu-toggle" id="bookMenuToggle" aria-label="Toggle book menu">
-              <!-- ...existing code... -->
-            </button>
+          <div class="book-item">
+            <img src="path/to/cover1.jpg" alt="Book Cover" class="book-cover" />
+            <div class="book-actions">
+              <button class="book-menu-toggle" id="bookMenuToggle" aria-label="Toggle book menu">
+                <!-- ...existing code... -->
+              </button>
+            </div>
           </div>
         </div>
       </section>
       <section class="card">
         <h2>Selesai dibaca</h2>
         <div id="completeBookList" class="book-grid">
-          <div class="book-actions">
-            <button class="book-menu-toggle" id="bookMenuToggle" aria-label="Toggle book menu">
-              <!-- ...existing code... -->
-            </button>
+          <div class="book-item">
+            <img src="path/to/cover2.jpg" alt="Book Cover" class="book-cover" />
+            <div class="book-actions">
+              <button class="book-menu-toggle" id="bookMenuToggle" aria-label="Toggle book menu">
+                <!-- ...existing code... -->
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -147,6 +158,7 @@
             <h2>Edit Buku</h2>
             <button class="close-button" id="closeEditBook">&times;</button>
           </div>
+          
           <form id="editForm" data-testid="editForm">
             <div class="form-group">
               <label for="editFormCover">Sampul Buku</label>
@@ -157,6 +169,7 @@
                 data-testid="editFormCoverInput" />
               <small class="form-hint">Rekomendasi: Gambar dengan rasio 6:9</small>
             </div>
+            
             <div class="form-group">
               <label for="editFormTitle">Judul</label>
               <input
@@ -165,6 +178,7 @@
                 required
                 data-testid="editFormTitleInput" />
             </div>
+            
             <div class="form-group">
               <label for="editFormAuthor">Penulis</label>
               <input
@@ -173,6 +187,7 @@
                 required
                 data-testid="editFormAuthorInput" />
             </div>
+            
             <div class="form-group">
               <label for="editFormYear">Tahun</label>
               <input
@@ -183,21 +198,34 @@
                 step="1"
                 data-testid="editFormYearInput" />
             </div>
-            <button
-              id="editFormSubmit"
-              type="submit"
-              class="btn-save"
-              data-testid="editFormSubmitButton">
-              Simpan Perubahan
-            </button>
-            <button
-              id="editFormCancel"
-              type="button"
-              class="btn-cancel"
-              data-testid="editFormCancelButton">
-              Batalkan Perubahan
-            </button>
+      
+            <div class="modal-actions">
+              <button
+                id="editFormCancel"
+                type="button"
+                class="btn-cancel"
+                data-testid="editFormCancelButton">
+                Batalkan Perubahan
+              </button>
+              <button
+                id="editFormSubmit"
+                type="submit"
+                class="btn-save"
+                data-testid="editFormSubmitButton">
+                Simpan Perubahan
+              </button>
+            </div>
           </form>
+        </div>
+      </section>
+      
+      <!-- Add the Image Modal -->
+      <section id="imageModal" class="image-modal">
+        <div class="image-modal-content">
+          <button class="close-button" id="closeImageModal">
+            <span>&times;</span>
+          </button>
+          <img id="modalBookCover" src="" alt="Book Cover" />
         </div>
       </section>
     </main>

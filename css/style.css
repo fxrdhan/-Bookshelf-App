@@ -597,6 +597,13 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* Enforce 6:9 aspect ratio for book cover images */
+.book-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3; /* 6:9 simplifies to 2:3 */
+  object-fit: cover;
+}
+
 .book-item h3 {
   color: var(--text-color);
   margin-bottom: 0.5rem;
@@ -941,26 +948,130 @@ body[data-theme="light"] {
 .modal {
   display: none;
   position: fixed;
+  inset: 0; /* Shorthand for top: 0; right: 0; bottom: 0; left: 0; */
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  /* Perfect centering with flex */
+  display: none; /* Will be overridden when modal is shown */
+  align-items: center;
+  justify-content: center;
+}
+
+.image-modal {
+  display: none;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px);
 }
 
 .modal-content {
   position: relative;
   background: var(--surface-color);
-  margin: 2rem auto;
   padding: 2rem;
   border-radius: 12px;
   width: 90%;
   max-width: 600px;
-  animation: modalSlideIn 0.3s ease-out;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 50px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border-color);
+  /* Center positioning */
+  margin: 6rem auto;
+  /* Handle overflow */
+  max-height: 85vh; /* Slightly reduced to ensure it's always visible */
+  overflow-y: auto;
+  /* Animation */
+  opacity: 0;
+  transform: scale(0.95) translateY(-10px);
+  animation: modalFadeIn 0.3s ease-out forwards;
+}
+
+.image-modal-content {
+  position: absolute;
+  background: var(--surface-color);
+  margin: 9.5rem auto;
+  inset: 0;
+  transform: translate(-50%, -50%);
+  padding-top: 2rem;
+  padding-bottom: 0;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px; 
+  animation: modalFadeIn 0.3s ease-out forwards;
+  box-shadow: 0 6px 50px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-color);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (max-width: 425px) {
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .image-modal-content {
+    margin: 12rem auto;
+    max-width: 300px;
+  }
+}
+
+@media (min-width: 426px) and (max-width: 768px) {
+  .modal-content,
+  .image-modal-content {
+    width: 95%;
+    max-width: 500px;
+  }
+  
+  .image-modal-content {
+    margin: 15rem auto;
+    max-width: 350px;
+  }
+}
+
+@media (min-width: 769px) {
+  .image-modal-content {
+    margin: 8rem auto;
+    max-width: 400px;
+  }
+}
+
+.modal-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--surface-color);
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: var(--surface-color);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
 }
 
 .modal-header {
@@ -968,39 +1079,79 @@ body[data-theme="light"] {
   margin-bottom: 1.5rem;
 }
 
-.close-button {
-  position: absolute;
-  top: -1rem;
-  right: -1rem;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  font-size: 1.5rem;
-  color: var(--text-color);
-  cursor: pointer;
-  padding: 0;  /* Changed from 0.5rem to 0 */
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.modal-actions {
   display: flex;
+  justify-content: flex-end; /* Change to flex-end to align buttons to right */
   align-items: center;
-  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  gap: 1rem;
+}
+
+/* Style for action buttons */
+.btn-save,
+.btn-cancel {
+  min-width: 100px; /* Reduce from 120px */
+  padding: 0.5rem 1rem; /* Reduce padding */
+  font-size: 0.875rem; /* Slightly smaller font */
+  border-radius: 6px; /* Slightly smaller radius */
+  font-weight: 500; /* Slightly less bold */
+}
+
+/* Remove flex: 1 and max-width restrictions */
+.modal-actions button {
+  width: auto; /* Let buttons size to content */
+}
+
+/* Style for the save button */
+.btn-save {
+  order: 2; /* Push to right */
+  min-width: 120px;
+  padding: 0.75rem 1.5rem;
+  background: var(--success-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
   transition: all 0.2s ease;
-  z-index: 1;
-  line-height: 0;  /* Added to help with vertical centering */
 }
 
-.close-button span {
-  display: flex;          /* Added to center the × symbol */
-  align-items: center;    /* Added to center the × symbol */
-  justify-content: center;/* Added to center the × symbol */
-  width: 100%;           /* Added to ensure full width */
-  height: 100%;          /* Added to ensure full height */
-  margin-bottom: 2px;    /* Optional: fine-tune vertical position */
+/* Style for the cancel button */
+.btn-cancel {
+  order: 1; /* Keep on left */
+  min-width: 120px;
+  padding: 0.75rem 1.5rem;
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-.close-button:hover {
-  background: var(--input-bg);
-  transform: scale(1.1);
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-cancel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* Add active state for buttons */
+.btn-save:active,
+.btn-cancel:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* Hide close buttons and make colors transparent */
+.close-button {
+  display: none;
+  background: transparent;
+  color: transparent;
 }
 
 body.modal-open {
@@ -1374,3 +1525,104 @@ input[type="file"]::-moz-file-upload-button:hover {
   right: 0.75rem;
   bottom: auto;
 }
+
+/* Image Modal Styles */
+.image-modal-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+}
+
+.image-modal-content img {
+  max-width: 80%;    /* Reduced from 90% */
+  max-height: 80vh;  /* Reduced from 90vh */
+  border: none;
+  box-shadow: none;
+}
+
+/* Ensure no border or padding for image modal content */
+.image-modal-content {
+  padding: 0;
+  border: none;
+}
+
+/* Image Modal Adjustments */
+.image-modal-content {
+  padding: 0; /* Remove any padding */
+  display: flex;
+  position: relative; /* Enable absolute positioning for close button */
+  align-items: center;
+  justify-content: center;
+}
+
+.image-modal-content img {
+  max-width: 100%;
+  max-height: 100vh;
+  display: block;
+}
+
+/* Enforce 6:9 aspect ratio for image modal */
+.image-modal-content img {
+  aspect-ratio: 2 / 3; /* Maintain 6:9 ratio */
+  object-fit: cover;
+}
+
+/* Ensure no border or padding for image modal content */
+.image-modal-content {
+  padding: 0;
+  border: none;
+}
+
+/* Ensure images in the cover modal fill the modal area */
+.image-modal-content img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Remove or comment out the aspect-ratio if it conflicts with full coverage */
+/* .image-modal-content img {
+  aspect-ratio: 2 / 3; 
+} */
+
+/* ...existing code... */
+
+/* Add styles for the search container and button */
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+#searchBookTitle {
+  padding-right: 3rem;
+}
+
+.search-button {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease;
+}
+
+.search-button:hover {
+  color: var(--primary-color);
+}
+
+.search-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ...existing code... */
