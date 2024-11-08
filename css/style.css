@@ -1076,7 +1076,7 @@ body[data-theme="light"] {
 
 .modal-header {
   position: relative;
-  margin-bottom: 1.5rem;
+  /* margin-bottom: 1.5rem; */
 }
 
 .modal-actions {
