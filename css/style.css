@@ -543,10 +543,8 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   opacity: 0.7;
   border-radius: 50%;
   isolation: isolate; /* Add this to create a new stacking context */
-}
-
-.book-menu-toggle:hover {
-  isolation: isolate; /* Add this to create a new stacking context */
+  pointer-events: auto !important;
+  z-index: 10;
 }
 
 /* Refactor book-actions to center over the cover without a box */
@@ -562,6 +560,8 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
+  z-index: 5;
+  pointer-events: auto;
 }
 
 /* Show book-actions when menu is open */
@@ -757,7 +757,7 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   }
 
   .book-actions button {
-    padding: 0.35rem 0.5rem; /* Smaller padding for menu items */
+    padding: 0.5rem 0.1rem; /* Smaller padding for menu items */
     font-size: 0.85rem; /* Smaller font */
   }
 
@@ -982,7 +982,7 @@ body[data-theme="light"] {
   box-shadow: 0 6px 50px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border-color);
   /* Center positioning */
-  margin: auto;
+  margin: 2rem auto;
   /* Handle overflow */
   max-height: 85vh; /* Slightly reduced to ensure it's always visible */
   overflow-y: auto;
@@ -1030,7 +1030,7 @@ body[data-theme="light"] {
 
 @media (max-width: 425px) {
   .image-modal-content {
-    margin: 12rem auto;
+    margin: 10rem auto;
     max-width: 300px;
   }
 }
@@ -1626,3 +1626,352 @@ input[type="file"]::-moz-file-upload-button:hover {
 }
 
 /* ...existing code... */
+
+/* View Mode Transition Styles */
+.book-grid {
+  display: grid;
+  gap: 1.5rem;
+  transition: none; /* Remove default transition */
+}
+
+/* Grid View Base Styles */
+.book-grid.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+/* Cover View Base Styles */
+.book-grid.cover-view {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* Animation Classes */
+.book-item {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+/* Zoom Out Animation */
+.zoom-out {
+  animation: zoomOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes zoomOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* Zoom In Animation */
+.zoom-in {
+  animation: zoomIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes zoomIn {
+  0% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Ensure images maintain aspect ratio during transition */
+.book-cover {
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prevent animation stacking */
+.book-grid.animating {
+  pointer-events: none;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .book-grid.grid-view {
+    grid-template-columns: 1fr;
+  }
+  
+  .book-grid.cover-view {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* ...existing code... */
+
+/* Remove duplicate keyframes and consolidate animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes liftUp {
+  0% {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  100% {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Add GPU acceleration and optimization for book items */
+.book-item {
+  /* Remove animation */
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  transition: transform 0.3s ease, 
+              opacity 0.3s ease,
+              box-shadow 0.3s ease;
+}
+
+/* Optimize view mode transitions */
+.book-grid {
+  display: grid;
+  gap: 1.5rem;
+  transition: grid-template-columns 0.5s ease-out,
+              gap 0.5s ease-out;
+}
+
+.book-grid.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+.book-grid.cover-view {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* Remove zoom animations */
+.zoom-out, .zoom-in {
+  transition: transform 0.3s ease-out,
+              opacity 0.3s ease-out;
+}
+
+/* Optimize book cover transitions */
+.book-cover {
+  transition: width 0.3s ease-out,
+              height 0.3s ease-out;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* ...rest of existing code... */
+
+/* Remove or update problematic animations */
+.book-grid.animating {
+  pointer-events: none;
+}
+
+/* Ensure consistent final states */
+.book-grid.grid-view .book-item,
+.book-grid.cover-view .book-item {
+  opacity: 1;
+  transform: translateZ(0);
+}
+
+/* Update media queries with smooth transitions */
+@media (max-width: 768px) {
+  .book-grid.grid-view,
+  .book-grid.cover-view {
+    transition: grid-template-columns 0.3s ease-out;
+  }
+  
+  .book-grid.grid-view {
+    grid-template-columns: 1fr;
+  }
+  
+  .book-grid.cover-view {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+/* Base styles for book grid */
+.book-grid {
+  display: grid;
+  gap: 1.5rem;
+  transition: grid-template-columns 0.3s ease-out;
+  will-change: grid-template-columns;
+}
+
+/* Grid view layout */
+.book-grid.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+}
+
+/* Cover view layout */
+.book-grid.cover-view {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+/* Book item base styles */
+.book-item {
+  position: relative;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity, padding;
+}
+
+/* Transition animations for view mode changes */
+.book-item.transitioning-to-cover {
+  transform: scale(0.85);
+  opacity: 0.6;
+}
+
+.book-item.transitioning-to-grid {
+  transform: scale(0.95);
+  opacity: 0.6;
+}
+
+/* Transition states */
+.book-item.transitioning {
+  pointer-events: none;
+}
+
+/* Grid view specific styles */
+.grid-view .book-item {
+  display: flex;
+  padding: 1.5rem;
+  gap: 1rem;
+}
+
+/* Cover view specific styles */
+.cover-view .book-item {
+  padding: 0;
+  flex-direction: column;
+}
+
+/* Book cover transitions */
+.book-cover {
+  transition: width 0.3s ease-out,
+              height 0.3s ease-out,
+              transform 0.3s ease-out;
+  will-change: width, height, transform;
+  transform: translateZ(0);
+}
+
+/* Grid view cover styles */
+.grid-view .book-cover {
+  width: 150px;
+  height: 225px;
+}
+
+/* Cover view cover styles */
+.cover-view .book-cover {
+  width: 100%;
+  height: 100%;
+}
+
+/* Book content transitions */
+.book-content {
+  transition: opacity 0.3s ease-out,
+              transform 0.3s ease-out,
+              padding 0.3s ease-out;
+  will-change: opacity, transform, padding;
+}
+
+/* Grid view content styles */
+.grid-view .book-content {
+  opacity: 1;
+  transform: translateX(0);
+  padding-right: 2.5rem;
+}
+
+/* Cover view content styles */
+.cover-view .book-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 0.75rem 0.75rem;
+  background: linear-gradient(to top, 
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    transparent 100%);
+  border-radius: 0 0 8px 8px;
+}
+
+/* Optimize transitions for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .book-grid,
+  .book-item,
+  .book-cover,
+  .book-content {
+    transition: none;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .book-grid.grid-view {
+    grid-template-columns: 1fr;
+  }
+  
+  .book-grid.cover-view {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .grid-view .book-cover {
+    width: 80px;
+    height: 120px;
+  }
+}
+
+/* Hardware acceleration for smoother transitions */
+.book-grid,
+.book-item,
+.book-cover,
+.book-content {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Preview button styles */
+.preview-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+}
+
+.preview-button:disabled {
+  background: var(--border-color);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.preview-button:not(:disabled):hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.preview-button svg {
+  width: 16px;
+  height: 16px;
+}

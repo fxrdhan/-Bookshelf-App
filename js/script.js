@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const isChecked = isCompleteCheckbox.checked;
     submitButton.innerHTML = isChecked
       ? 'Masukkan Buku ke rak <span>Selesai dibaca</span>'
-      : 'Masukkan Buku ke rak <span>Belum selesai dibaca</span>';
+      : 'Masukkan Buku ke rak <span>Blm. selesai dibaca</span>';
   };
 
   isCompleteCheckbox.addEventListener("change", updateSubmitButton);
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </button>
       <div class="book-actions">
         <button class="btn-complete" data-testid="bookItemIsCompleteButton">
-        ${book.isComplete ? "Belum selesai dibaca" : "Selesai dibaca"}
+        ${book.isComplete ? "Blm. selesai dibaca" : "Selesai dibaca"}
         </button>
         <button class="btn-edit" data-testid="bookItemEditButton">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -113,11 +113,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const menuToggle = bookElement.querySelector(".book-menu-toggle");
     const actionsMenu = bookElement.querySelector(".book-actions");
-    const completeButton = bookElement.querySelector('[data-testid="bookItemIsCompleteButton"]');
-    const deleteButton = bookElement.querySelector('[data-testid="bookItemDeleteButton"]');
-    const editButton = bookElement.querySelector('[data-testid="bookItemEditButton"]');
-
-    menuToggle.addEventListener("click", (e) => {
+    // Remove old event listener if exists
+    const menuToggleHandler = (e) => {
       e.stopPropagation();
       document.querySelectorAll('.book-item').forEach(item => {
         if (item !== bookElement) {
@@ -127,7 +124,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
       actionsMenu.classList.toggle("show");
       bookElement.classList.toggle("menu-open");
-    });
+    };
+
+    menuToggle.removeEventListener("click", menuToggleHandler);
+    menuToggle.addEventListener("click", menuToggleHandler);
+    menuToggle.style.pointerEvents = 'auto'; // Ensure clickable
+
+    const completeButton = bookElement.querySelector('[data-testid="bookItemIsCompleteButton"]');
+    const deleteButton = bookElement.querySelector('[data-testid="bookItemDeleteButton"]');
+    const editButton = bookElement.querySelector('[data-testid="bookItemEditButton"]');
 
     completeButton.onclick = () => {
       actionsMenu.classList.remove("show");
@@ -440,27 +445,150 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   bookForm.addEventListener("submit", addBook);
 
-  const viewModeToggle = document.getElementById("viewModeToggle");
+  renderBooks();
+
+  // Add preview functionality
+  const setupImagePreview = (inputId, previewBtnId) => {
+    const input = document.getElementById(inputId);
+    const previewBtn = document.getElementById(previewBtnId);
+    
+    input.addEventListener('change', () => {
+      previewBtn.disabled = !input.files || !input.files[0];
+    });
+    
+    previewBtn.addEventListener('click', () => {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const modal = document.getElementById('imageModal');
+          const modalImage = document.getElementById('modalBookCover');
+          modalImage.src = e.target.result;
+          modal.style.display = 'block';
+          document.body.classList.add('modal-open');
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    });
+  };
   
-  const setViewMode = (mode) => {
-    const bookGrids = document.querySelectorAll('.book-grid');
-    bookGrids.forEach(grid => {
+  // Setup preview for add book form
+  setupImagePreview('bookFormCover', 'previewCoverBtn');
+  
+  // Setup preview for edit book form
+  setupImagePreview('editFormCover', 'previewEditCoverBtn');
+});
+
+const setViewMode = (mode) => {
+  const bookGrids = document.querySelectorAll('.book-grid');
+  const currentMode = localStorage.getItem('viewMode') || 'grid';
+  
+  // If same mode, no need to animate
+  if (mode === currentMode) return;
+  
+  // Prevent interaction during transition
+  bookGrids.forEach(grid => {
+    // Add transition class to grid
+    grid.style.pointerEvents = 'none';
+    
+    // Mark all items as transitioning with specific transition class
+    let bookItems = grid.querySelectorAll('.book-item');
+    bookItems.forEach(item => {
+      item.classList.add('transitioning');
+      // Add specific transition class based on target mode
+      item.classList.add(`transitioning-to-${mode}`);
+    });
+    
+    // Use requestAnimationFrame for smooth transition
+    requestAnimationFrame(() => {
+      // Change view mode
       grid.classList.remove('grid-view', 'cover-view');
       grid.classList.add(`${mode}-view`);
+      
+      // Re-query DOM for updated items
+      bookItems = grid.querySelectorAll('.book-item');
+      bookItems.forEach(item => {
+        const menuToggle = item.querySelector('.book-menu-toggle');
+        if (menuToggle) menuToggle.style.pointerEvents = 'auto';
+      });
+      
+      // After transition completes
+      const onTransitionEnd = (e) => {
+        if (e.target === grid) {
+          // Remove all transition classes
+          bookItems.forEach(item => {
+            item.classList.remove('transitioning');
+            item.classList.remove('transitioning-to-grid');
+            item.classList.remove('transitioning-to-cover');
+          });
+          
+          // Ensure menu toggles are clickable
+          bookItems.forEach(item => {
+            const menuToggle = item.querySelector('.book-menu-toggle');
+            if (menuToggle) menuToggle.style.pointerEvents = 'auto';
+          });
+          
+          // Re-enable interactions
+          grid.style.pointerEvents = '';
+          
+          // Remove event listener
+          grid.removeEventListener('transitionend', onTransitionEnd);
+        }
+      };
+      
+      // Listen for transition completion
+      grid.addEventListener('transitionend', onTransitionEnd);
     });
-    viewModeToggle.classList.toggle('grid', mode === 'cover');
-    localStorage.setItem('viewMode', mode);
-  };
-
-  viewModeToggle.addEventListener('click', () => {
-    const currentMode = localStorage.getItem('viewMode') || 'grid';
-    setViewMode(currentMode === 'grid' ? 'cover' : 'grid');
   });
+  
+  // Update toggle button state
+  const viewModeToggle = document.getElementById('viewModeToggle');
+  viewModeToggle.classList.toggle('grid', mode === 'cover');
+  
+  // Save preference
+  localStorage.setItem('viewMode', mode);
+};
 
+// Optimize view mode toggle handler
+const initializeViewModeToggle = () => {
+  const viewModeToggle = document.getElementById('viewModeToggle');
+  if (!viewModeToggle) return;
+
+  // Debounce view mode changes
+  let isTransitioning = false;
+  
+  viewModeToggle.addEventListener('click', () => {
+    if (isTransitioning) return;
+    
+    isTransitioning = true;
+    const currentMode = localStorage.getItem('viewMode') || 'grid';
+    const newMode = currentMode === 'grid' ? 'cover' : 'grid';
+    
+    setViewMode(newMode);
+    
+    // Reset transition lock after animation
+    setTimeout(() => {
+      isTransitioning = false;
+    }, 350); // Slightly longer than transition duration
+  });
+  
+  // Set initial view mode
   const savedViewMode = localStorage.getItem('viewMode') || 'grid';
   setViewMode(savedViewMode);
+};
 
-  renderBooks();
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  initializeViewModeToggle();
+  
+  // Optional: Reset transition states on window resize
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      const currentMode = localStorage.getItem('viewMode') || 'grid';
+      setViewMode(currentMode);
+    }, 100);
+  });
 });
 
 function openImageModal(event) {
