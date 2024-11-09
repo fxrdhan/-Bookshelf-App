@@ -1,3 +1,40 @@
+const DEFAULT_BOOK_COVER = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300">
+  <rect width="200" height="300" fill="#6d28d9" />
+  <defs>
+    <linearGradient id="coverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#16325B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1A1A1D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="300" fill="url(#coverGradient)" />
+  <path d="M60 100 L140 100 L140 200 L60 200 Z" fill="none" stroke="white" stroke-width="4"/>
+  <path d="M60 100 C80 100 120 100 140 100" stroke="white" stroke-width="4" fill="none"/>
+  <path d="M60 200 C80 200 120 200 140 200" stroke="white" stroke-width="4" fill="none"/>
+  <rect x="75" y="125" width="50" height="3" fill="white" opacity="0.8"/>
+  <rect x="75" y="135" width="40" height="3" fill="white" opacity="0.8"/>
+  <rect x="75" y="145" width="45" height="3" fill="white" opacity="0.8"/>
+  <text x="100" y="240" text-anchor="middle" fill="white" font-family="sans-serif" font-size="16">No Cover</text>
+</svg>`)}`;
+
+let sortOrders = {
+  incomplete: 'asc',
+  complete: 'asc'
+};
+
+// Function untuk mengurutkan buku
+const sortBooks = (books, order = 'asc') => {
+  return [...books].sort((a, b) => {
+    const titleA = a.title.toLowerCase();
+    const titleB = b.title.toLowerCase();
+    
+    if (order === 'asc') {
+      return titleA.localeCompare(titleB);
+    } else {
+      return titleB.localeCompare(titleA);
+    }
+  });
+};
+
 document.addEventListener("DOMContentLoaded", async () => {
   const themeToggle = document.getElementById("themeToggle");
   const sunIcon = themeToggle.querySelector(".sun-icon");
@@ -71,20 +108,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     bookElement.setAttribute("data-bookid", book.id);
     bookElement.setAttribute("data-testid", "bookItem");
 
-    if (book.cover) {
-      const coverImg = document.createElement("img");
-      coverImg.src = book.cover;
-      coverImg.className = "book-cover";
-      coverImg.alt = `Cover ${book.title}`;
-      coverImg.addEventListener('click', openImageModal);
-      coverImg.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openImageModal(e);
-      });
-      bookElement.appendChild(coverImg);
-    }
-
+    // Gunakan cover default jika tidak ada cover
+    const coverSrc = book.cover || DEFAULT_BOOK_COVER;
+    
     bookElement.innerHTML += `
+      <img src="${coverSrc}" class="book-cover" alt="Cover ${book.title}">
       <div class="book-content">
         <h3 data-testid="bookItemTitle">${book.title}</h3>
         <p data-testid="bookItemAuthor">${book.author}</p>
@@ -171,36 +199,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  const renderBooks = (filteredBooks = books) => {
-    const currentViewMode = localStorage.getItem('viewMode') || 'grid';
-    const bookGrids = document.querySelectorAll('.book-grid');
-    const currentGridClasses = Array.from(bookGrids[0]?.classList || [])
-      .filter(className => className.includes('-view'));
+  function createViewAllButton() {
+    const button = document.createElement("button");
+    button.className = "view-all-button";
+    button.textContent = "Lihat Semua";
+    return button;
+  }
 
-    incompleteList.innerHTML = "";
-    completeList.innerHTML = "";
-
-    document.querySelectorAll('.view-all-button').forEach(button => button.remove());
-
-    function createViewAllButton() {
-      const button = document.createElement("button");
-      button.className = "view-all-button";
-      button.textContent = "Lihat Semua";
-      return button;
+  const renderBookSection = (books, listElement, viewAllButton) => {
+    // Bersihkan konten dan tombol view all yang ada
+    listElement.innerHTML = "";
+    const parentSection = listElement.parentElement;
+    const existingViewAllButton = parentSection.querySelector('.view-all-button');
+    if (existingViewAllButton) {
+      existingViewAllButton.remove();
     }
     
-    const incompleteViewAll = createViewAllButton();
-    const completeViewAll = createViewAllButton();
-
-    filteredBooks.forEach((book) => {
+    // Tambahkan currentViewMode
+    const currentViewMode = localStorage.getItem('viewMode') || 'grid';
+    
+    books.forEach((book) => {
       const bookElement = createBookElement(book);
-      if (book.isComplete) {
-        completeList.appendChild(bookElement);
-      } else {
-        incompleteList.appendChild(bookElement);
-      }
+      listElement.appendChild(bookElement);
     });
-
+  
     const applyCollapse = (list, button) => {
       const isDesktop = window.innerWidth >= 769;
       const threshold = isDesktop ? 6 : 3;
@@ -208,18 +230,57 @@ document.addEventListener("DOMContentLoaded", async () => {
         list.classList.add('collapsed');
         button.classList.add('visible');
         list.parentElement.appendChild(button);
-
-        button.addEventListener('click', () => {
+  
+        // Hapus event listener lama jika ada
+        button.removeEventListener('click', button.toggleCollapseHandler);
+        
+        // Tambahkan event listener baru dengan referensi yang disimpan
+        button.toggleCollapseHandler = () => {
           list.classList.toggle('collapsed');
           button.textContent = list.classList.contains('collapsed') ? 'Lihat Semua' : 'Lihat Sedikit';
-        });
+        };
+        
+        button.addEventListener('click', button.toggleCollapseHandler);
       } else {
         list.classList.remove('collapsed');
       }
     };
+  
+    applyCollapse(listElement, viewAllButton);
+    
+    // Terapkan view mode yang aktif
+    listElement.classList.remove('grid-view', 'cover-view');
+    listElement.classList.add(`${currentViewMode}-view`);
+    
+    attachBookCoverHandlers();
+  };
 
-    applyCollapse(incompleteList, incompleteViewAll);
-    applyCollapse(completeList, completeViewAll);
+  const renderBooks = (filteredBooks = books) => {
+    const currentViewMode = localStorage.getItem('viewMode') || 'grid';
+    const bookGrids = document.querySelectorAll('.book-grid');
+    
+    document.querySelectorAll('.view-all-button').forEach(button => button.remove());
+
+    // Split books into complete and incomplete
+    const incompleteBooks = filteredBooks.filter(book => !book.isComplete);
+    const completeBooks = filteredBooks.filter(book => book.isComplete);
+
+    // Sort books based on current sort order
+    const sortedIncompleteBooks = sortBooks(incompleteBooks, sortOrders.incomplete);
+    const sortedCompleteBooks = sortBooks(completeBooks, sortOrders.complete);
+
+    // Update sort button icons
+    document.querySelectorAll('.sort-button').forEach(button => {
+      const section = button.dataset.section;
+      button.classList.toggle('descending', sortOrders[section] === 'desc');
+    });
+
+    const incompleteViewAll = createViewAllButton();
+    const completeViewAll = createViewAllButton();
+
+    // Render books for both sections
+    renderBookSection(sortedIncompleteBooks, incompleteList, incompleteViewAll);
+    renderBookSection(sortedCompleteBooks, completeList, completeViewAll);
 
     const newBookGrids = document.querySelectorAll('.book-grid');
     newBookGrids.forEach(grid => {
@@ -229,8 +290,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const viewModeToggle = document.getElementById('viewModeToggle');
     viewModeToggle.classList.toggle('grid', currentViewMode === 'cover');
-
-    attachBookCoverHandlers();
   };
 
   let lastWidth = window.innerWidth;
@@ -370,15 +429,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const coverInput = document.getElementById("bookFormCover");
     
     let coverUrl = null;
-    if (coverInput.dataset.croppedImage) {
-      coverUrl = coverInput.dataset.croppedImage;
+    
+    const createAndSaveBook = (coverUrl) => {
       const newBook = {
         id: generateId(),
         title,
         author,
         year,
         isComplete,
-        cover: coverUrl
+        cover: coverUrl || DEFAULT_BOOK_COVER // Gunakan default cover jika tidak ada cover
       };
       
       books.push(newBook);
@@ -387,46 +446,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       toggleAddBookModal();
       event.target.reset();
       updateSubmitButton(false);
-    } else {
-      let coverUrl = null;
-      if (coverInput.files && coverInput.files[0]) {
+    };
+
+    if (coverInput.dataset.croppedImage) {
+      createAndSaveBook(coverInput.dataset.croppedImage);
+    } else if (coverInput.files && coverInput.files[0]) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          coverUrl = e.target.result;
-          const newBook = {
-            id: generateId(),
-            title,
-            author,
-            year,
-            isComplete,
-            cover: coverUrl
-          };
-          
-          books.push(newBook);
-          saveBooks();
-          renderBooks();
-          toggleAddBookModal();
-          event.target.reset();
-          updateSubmitButton(false);
+        createAndSaveBook(e.target.result);
         };
         reader.readAsDataURL(coverInput.files[0]);
       } else {
-        const newBook = {
-          id: generateId(),
-          title,
-          author,
-          year,
-          isComplete,
-          cover: null
-        };
-        
-        books.push(newBook);
-        saveBooks();
-        renderBooks();
-        toggleAddBookModal();
-        event.target.reset();
-        updateSubmitButton(false);
-      }
+      // Jika tidak ada file yang dipilih, gunakan cover default
+      createAndSaveBook(null);
     }
   };
 
@@ -435,7 +467,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (book) {
       book.isComplete = !book.isComplete;
       saveBooks();
+      // Store current view mode before re-rendering
+      const currentMode = localStorage.getItem('viewMode') || 'grid';
       renderBooks();
+      // Reapply the same view mode to maintain consistency
+      setViewMode(currentMode);
     }
   };
 
@@ -514,13 +550,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const book = books.find(b => b.id === editingBookId);
     const coverInput = document.getElementById("editFormCover");
     
-    if (coverInput.dataset.croppedImage) {
+    const updateBookWithCover = (coverUrl) => {
       const updatedBook = {
         ...book,
         title: editFormTitle.value,
         author: editFormAuthor.value,
         year: parseInt(editFormYear.value),
-        cover: coverInput.dataset.croppedImage
+        cover: coverUrl || book.cover || DEFAULT_BOOK_COVER // Gunakan existing cover atau default
       };
       
       books = books.map((b) =>
@@ -529,41 +565,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBooks();
       renderBooks();
       hideEditForm();
-    } else {
-      if (coverInput.files && coverInput.files[0]) {
+    };
+    
+    if (coverInput.dataset.croppedImage) {
+      updateBookWithCover(coverInput.dataset.croppedImage);
+    } else if (coverInput.files && coverInput.files[0]) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          const updatedBook = {
-            ...book,
-            title: editFormTitle.value,
-            author: editFormAuthor.value,
-            year: parseInt(editFormYear.value),
-            cover: e.target.result
-          };
-          
-          books = books.map((b) =>
-            b.id === editingBookId ? updatedBook : b
-          );
-          saveBooks();
-          renderBooks();
-          hideEditForm();
+        updateBookWithCover(e.target.result);
         };
         reader.readAsDataURL(coverInput.files[0]);
       } else {
-        const updatedBook = {
-          ...book,
-          title: editFormTitle.value,
-          author: editFormAuthor.value,
-          year: parseInt(editFormYear.value)
-        };
-        
-        books = books.map((b) =>
-          b.id === editingBookId ? updatedBook : b
-        );
-        saveBooks();
-        renderBooks();
-        hideEditForm();
-      }
+      // Jika tidak ada file baru yang dipilih, gunakan cover yang ada atau default
+      updateBookWithCover(null);
     }
   };
 
@@ -608,88 +622,63 @@ document.addEventListener("DOMContentLoaded", async () => {
   setupImagePreview('editFormCover', 'previewEditCoverBtn');
   
   attachBookCoverHandlers();
+
+  document.querySelectorAll('.sort-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const section = button.dataset.section;
+      const targetList = section === 'incomplete' ? incompleteList : completeList;
+      const filteredBooks = books.filter(book => 
+        section === 'incomplete' ? !book.isComplete : book.isComplete
+      );
+      
+      // Toggle sort order
+      sortOrders[section] = sortOrders[section] === 'asc' ? 'desc' : 'asc';
+      
+      // Update sort button icon
+      button.classList.toggle('descending', sortOrders[section] === 'desc');
+      
+      // Sort and render only the affected section
+      const sortedBooks = sortBooks(filteredBooks, sortOrders[section]);
+      const viewAllButton = createViewAllButton();
+      
+      // Render dengan mempertahankan view mode
+      renderBookSection(sortedBooks, targetList, viewAllButton);
+    });
+  });
 });
 
 const setViewMode = (mode) => {
   const bookGrids = document.querySelectorAll('.book-grid');
   const currentMode = localStorage.getItem('viewMode') || 'grid';
+  const viewModeToggle = document.getElementById('viewModeToggle');
   
-  // If same mode, no need to animate
-  if (mode === currentMode) return;
-  
-  // Prevent interaction during transition
-  bookGrids.forEach(grid => {
-    // Add transition class to grid
-    grid.style.pointerEvents = 'none';
-    
-    // Mark all items as transitioning with specific transition class
-    let bookItems = grid.querySelectorAll('.book-item');
-    bookItems.forEach(item => {
-      item.classList.add('transitioning');
-      // Add specific transition class based on target mode
-      item.classList.add(`transitioning-to-${mode}`);
-    });
-    
-    // Use requestAnimationFrame for smooth transition
-    requestAnimationFrame(() => {
-      // Change view mode
-      grid.classList.remove('grid-view', 'cover-view');
-      grid.classList.add(`${mode}-view`);
-      
-      // Re-query DOM for updated items
-      // bookItems = grid.querySelectorAll('.book-item');
-      // bookItems.forEach(item => {
-      //   const menuToggle = item.querySelector('.book-menu-toggle');
-      //   if (menuToggle) menuToggle.style.pointerEvents = 'auto';
-      // });
-      
-      // After transition completes
-      const onTransitionEnd = (e) => {
-        if (e.target === grid) {
-          // Remove all transition classes
-          bookItems.forEach(item => {
-            item.classList.remove('transitioning');
-            item.classList.remove('transitioning-to-grid');
-            item.classList.remove('transitioning-to-cover');
-          });
-
-          // Re-attach event listeners after transition
-          const covers = grid.querySelectorAll('.book-cover');
-          covers.forEach(cover => {
-            cover.removeEventListener('click', openImageModal);
-            cover.addEventListener('click', (e) => {
-              e.stopPropagation();
-              openImageModal(e);
-            });
-          });
-          
-          // Ensure menu toggles are clickable
-          bookItems.forEach(item => {
-            const menuToggle = item.querySelector('.book-menu-toggle');
-            if (menuToggle) menuToggle.style.pointerEvents = 'auto';
-          });
-          
-          attachBookCoverHandlers();
-          
-          // Re-enable interactions
-          grid.style.pointerEvents = '';
-          
-          // Remove event listener
-          grid.removeEventListener('transitionend', onTransitionEnd);
-        }
-      };
-      
-      // Listen for transition completion
-      grid.addEventListener('transitionend', onTransitionEnd);
-    });
+  // Add transition class to all book items
+  const bookItems = document.querySelectorAll('.book-item');
+  bookItems.forEach(item => {
+    item.classList.add('transitioning');
   });
   
   // Update toggle button state
-  const viewModeToggle = document.getElementById('viewModeToggle');
   viewModeToggle.classList.toggle('grid', mode === 'cover');
   
   // Save preference
   localStorage.setItem('viewMode', mode);
+  
+  // Update view mode after a small delay
+  setTimeout(() => {
+  bookGrids.forEach(grid => {
+    grid.classList.remove('grid-view', 'cover-view');
+    grid.classList.add(`${mode}-view`);
+    });
+    
+    // Remove transition class after animation
+    setTimeout(() => {
+      bookItems.forEach(item => {
+        item.classList.remove('transitioning');
+      });
+    attachBookCoverHandlers();
+    }, 400); // Match the CSS transition duration
+  }, 50);
 };
 
 // Optimize view mode toggle handler
@@ -707,12 +696,20 @@ const initializeViewModeToggle = () => {
     const currentMode = localStorage.getItem('viewMode') || 'grid';
     const newMode = currentMode === 'grid' ? 'cover' : 'grid';
     
+    // Add transitioning class to grid
+    document.querySelectorAll('.book-grid').forEach(grid => {
+      grid.classList.add('animating');
+    });
+    
     setViewMode(newMode);
     
-    // Reset transition lock after animation
+    // Remove transitioning classes after animation completes
     setTimeout(() => {
+      document.querySelectorAll('.book-grid').forEach(grid => {
+        grid.classList.remove('animating');
+      });
       isTransitioning = false;
-    }, 350); // Slightly longer than transition duration
+    }, 450); // Slightly longer than transition duration
   });
   
   // Set initial view mode
@@ -772,10 +769,17 @@ document.addEventListener('DOMContentLoaded', () => {
 function attachBookCoverHandlers() {
   const bookCovers = document.querySelectorAll('.book-cover');
   bookCovers.forEach(cover => {
-    cover.removeEventListener('click', openImageModal);
-    cover.addEventListener('click', (e) => {
+    // Remove all existing click event listeners
+    const clone = cover.cloneNode(true);
+    cover.parentNode.replaceChild(clone, cover);
+    
+    // Add new click event listener
+    clone.addEventListener('click', (e) => {
       e.stopPropagation();
       openImageModal(e);
     });
+    
+    // Ensure cursor style
+    clone.style.cursor = 'pointer';
   });
 }
