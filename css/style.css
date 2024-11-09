@@ -448,7 +448,7 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
 /* View All button styles */
 .view-all-button {
   display: none;
-  margin: 2rem auto; /* Increased margin */
+  margin: 1rem auto 0rem auto; /* Increased margin */
   padding: 0.75rem 1.5rem;
   background: var(--primary-color);
   color: white;
@@ -529,7 +529,6 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   filter: brightness(50%) blur(4px); /* Increase blur to 4px and darken */
 }
 
-/* Reset styling untuk menu dan toggle button */
 .book-menu-toggle {
   position: absolute;
   bottom: 0.75rem;
@@ -539,7 +538,7 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   border: none;
   color: var(--text-color);
   cursor: pointer;
-  z-index: 5;
+  z-index: 3;
   opacity: 0.7;
   border-radius: 50%;
   isolation: isolate; /* Add this to create a new stacking context */
@@ -560,7 +559,7 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  z-index: 5;
+  z-index: 4;
   pointer-events: auto;
 }
 
@@ -589,12 +588,14 @@ button:hover, .btn-save:hover, .btn-cancel:hover, .view-all-button.visible, .btn
   background: var(--primary-dark);
 }
 
+/* Base book cover styles */
 .book-cover {
-  width: 150px; /* 6 inches at 96dpi */
-  height: 225px; /* 9 inches at 96dpi */
+  width: 150px;
+  height: 225px;
   object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
 /* Enforce 6:9 aspect ratio for book cover images */
@@ -1081,12 +1082,13 @@ body[data-theme="light"] {
 
 .modal-actions {
   display: flex;
-  justify-content: flex-end; /* Change to flex-end to align buttons to right */
+  justify-content: stretch; /* Change to flex-end to align buttons to right */
   align-items: center;
   margin-top: 2rem;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
   gap: 1rem;
+  width: 100%;
 }
 
 /* Style for action buttons */
@@ -1101,6 +1103,7 @@ body[data-theme="light"] {
 
 /* Remove flex: 1 and max-width restrictions */
 .modal-actions button {
+  flex: 1;
   width: auto; /* Let buttons size to content */
 }
 
@@ -1174,7 +1177,7 @@ body.modal-open {
   padding-right: 2.5rem;
 }
 
-.book-menu-toggle {
+/* .book-menu-toggle {
   position: absolute;
   bottom: 0.75rem;
   right: 0.75rem;
@@ -1183,11 +1186,11 @@ body.modal-open {
   border: none;
   color: var(--text-color);
   cursor: pointer;
-  z-index: 2;
+  z-index: 3;
   opacity: 0.7;
   border-radius: 50%;
-  isolation: isolate; /* Add this to create a new stacking context */
-}
+  isolation: isolate;} /* Add this to create a new stacking context */
+
 
 .book-menu-toggle:hover {
   isolation: isolate; /* Add this to create a new stacking context */
@@ -1473,6 +1476,7 @@ input[type="file"]::-moz-file-upload-button:hover {
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 2;  /* Ensure content stays above cover in cover view */
   padding: 2rem 0.75rem 0.75rem;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
   border-radius: 0 0 8px 8px;
@@ -1845,17 +1849,23 @@ input[type="file"]::-moz-file-upload-button:hover {
   pointer-events: none;
 }
 
+.book-item.transitioning .book-cover {
+  pointer-events: auto !important;
+}
+
 /* Grid view specific styles */
 .grid-view .book-item {
   display: flex;
   padding: 1.5rem;
   gap: 1rem;
+  align-items: flex-start;  /* Ensure items align from the top */
 }
 
 /* Cover view specific styles */
 .cover-view .book-item {
   padding: 0;
   flex-direction: column;
+  position: relative;
 }
 
 /* Book cover transitions */
@@ -1877,6 +1887,8 @@ input[type="file"]::-moz-file-upload-button:hover {
 .cover-view .book-cover {
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 /* Book content transitions */
@@ -1892,6 +1904,8 @@ input[type="file"]::-moz-file-upload-button:hover {
   opacity: 1;
   transform: translateX(0);
   padding-right: 2.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 /* Cover view content styles */
@@ -1975,3 +1989,65 @@ input[type="file"]::-moz-file-upload-button:hover {
   width: 16px;
   height: 16px;
 }
+
+.crop-container {
+  max-height: 60vh;
+  margin: 1rem 0;
+  background: #000;
+}
+
+.crop-container img {
+  max-width: 100%;
+  max-height: 60vh;
+}
+
+.cropper-view-box,
+.cropper-face {
+  border-radius: 0;
+}
+
+.cropper-line,
+.cropper-point {
+  background-color: var(--primary-color);
+}
+
+/* ...existing code... */
+
+.crop-modal-actions {
+  display: flex;
+  justify-content: stretch;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.crop-modal-actions button {
+  flex: 1;
+  min-width: 0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  /* text-transform: uppercase; */
+  letter-spacing: 0.2px;
+}
+
+.crop-modal-actions .btn-cancel {
+  background: #ef4444;
+}
+
+.crop-modal-actions .btn-apply {
+  background: #10b981;
+}
+
+.crop-modal-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.crop-modal-actions button:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* ...existing code... */

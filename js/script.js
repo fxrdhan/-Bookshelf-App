@@ -76,6 +76,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       coverImg.src = book.cover;
       coverImg.className = "book-cover";
       coverImg.alt = `Cover ${book.title}`;
+      coverImg.addEventListener('click', openImageModal);
+      coverImg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openImageModal(e);
+      });
       bookElement.appendChild(coverImg);
     }
 
@@ -225,10 +230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const viewModeToggle = document.getElementById('viewModeToggle');
     viewModeToggle.classList.toggle('grid', currentViewMode === 'cover');
 
-    const bookCovers = document.querySelectorAll('.book-cover');
-    bookCovers.forEach(cover => {
-      cover.addEventListener('click', openImageModal);
-    });
+    attachBookCoverHandlers();
   };
 
   let lastWidth = window.innerWidth;
@@ -259,6 +261,101 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
+  let cropper = null;
+  let currentCropInput = null;
+
+  const initCropper = (image, aspectRatio = 2/3) => {
+    if (cropper) {
+      cropper.destroy();
+    }
+    
+    cropper = new Cropper(image, {
+      aspectRatio: aspectRatio,
+      viewMode: 2,
+      dragMode: 'move',
+      background: true,
+      responsive: true,
+      modal: true,
+      guides: true,
+      highlight: false,
+      autoCropArea: 1,
+    });
+  };
+
+  const handleImageSelect = (input) => {
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (e) => {
+        const cropModal = document.getElementById('cropModal');
+        const cropImage = document.getElementById('cropImage');
+        
+        cropImage.src = e.target.result;
+        cropModal.style.display = 'block';
+        document.body.classList.add('modal-open');
+        
+        // Initialize cropper after image is loaded
+        cropImage.addEventListener('load', () => {
+          initCropper(cropImage);
+        }, { once: true });
+        
+        currentCropInput = input;
+      };
+      
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Update file input event listeners
+  document.getElementById('bookFormCover').addEventListener('change', (e) => {
+    handleImageSelect(e.target);
+  });
+
+  document.getElementById('editFormCover').addEventListener('change', (e) => {
+    handleImageSelect(e.target);
+  });
+
+  // Add crop modal button handlers
+  document.getElementById('cancelCrop').addEventListener('click', () => {
+    const cropModal = document.getElementById('cropModal');
+    cropModal.style.display = 'none';
+    document.body.classList.remove('modal-open');
+    if (currentCropInput) {
+      currentCropInput.value = '';
+      currentCropInput = null;
+    }
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
+    }
+  });
+
+  document.getElementById('applyCrop').addEventListener('click', () => {
+    if (cropper && currentCropInput) {
+      const croppedCanvas = cropper.getCroppedCanvas({
+        width: 600,    // Set a good default width
+        height: 900,   // Maintain 2:3 ratio
+      });
+      
+      const croppedImage = croppedCanvas.toDataURL('image/jpeg', 0.9);
+      currentCropInput.dataset.croppedImage = croppedImage;
+      
+      // Enable preview button
+      const previewBtn = currentCropInput.id === 'bookFormCover' ? 
+        document.getElementById('previewCoverBtn') : 
+        document.getElementById('previewEditCoverBtn');
+      previewBtn.disabled = false;
+      
+      // Close modal and cleanup
+      const cropModal = document.getElementById('cropModal');
+      cropModal.style.display = 'none';
+      document.body.classList.remove('modal-open');
+      cropper.destroy();
+      cropper = null;
+    }
+  });
+
   const addBook = (event) => {
     event.preventDefault();
 
@@ -273,35 +370,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     const coverInput = document.getElementById("bookFormCover");
     
     let coverUrl = null;
-    if (coverInput.files && coverInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        coverUrl = e.target.result;
-        const newBook = {
-          id: generateId(),
-          title,
-          author,
-          year,
-          isComplete,
-          cover: coverUrl
-        };
-        
-        books.push(newBook);
-        saveBooks();
-        renderBooks();
-        toggleAddBookModal();
-        event.target.reset();
-        updateSubmitButton(false);
-      };
-      reader.readAsDataURL(coverInput.files[0]);
-    } else {
+    if (coverInput.dataset.croppedImage) {
+      coverUrl = coverInput.dataset.croppedImage;
       const newBook = {
         id: generateId(),
         title,
         author,
         year,
         isComplete,
-        cover: null
+        cover: coverUrl
       };
       
       books.push(newBook);
@@ -310,6 +387,46 @@ document.addEventListener("DOMContentLoaded", async () => {
       toggleAddBookModal();
       event.target.reset();
       updateSubmitButton(false);
+    } else {
+      let coverUrl = null;
+      if (coverInput.files && coverInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          coverUrl = e.target.result;
+          const newBook = {
+            id: generateId(),
+            title,
+            author,
+            year,
+            isComplete,
+            cover: coverUrl
+          };
+          
+          books.push(newBook);
+          saveBooks();
+          renderBooks();
+          toggleAddBookModal();
+          event.target.reset();
+          updateSubmitButton(false);
+        };
+        reader.readAsDataURL(coverInput.files[0]);
+      } else {
+        const newBook = {
+          id: generateId(),
+          title,
+          author,
+          year,
+          isComplete,
+          cover: null
+        };
+        
+        books.push(newBook);
+        saveBooks();
+        renderBooks();
+        toggleAddBookModal();
+        event.target.reset();
+        updateSubmitButton(false);
+      }
     }
   };
 
@@ -397,31 +514,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const book = books.find(b => b.id === editingBookId);
     const coverInput = document.getElementById("editFormCover");
     
-    if (coverInput.files && coverInput.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const updatedBook = {
-          ...book,
-          title: editFormTitle.value,
-          author: editFormAuthor.value,
-          year: parseInt(editFormYear.value),
-          cover: e.target.result
-        };
-        
-        books = books.map((b) =>
-          b.id === editingBookId ? updatedBook : b
-        );
-        saveBooks();
-        renderBooks();
-        hideEditForm();
-      };
-      reader.readAsDataURL(coverInput.files[0]);
-    } else {
+    if (coverInput.dataset.croppedImage) {
       const updatedBook = {
         ...book,
         title: editFormTitle.value,
         author: editFormAuthor.value,
-        year: parseInt(editFormYear.value)
+        year: parseInt(editFormYear.value),
+        cover: coverInput.dataset.croppedImage
       };
       
       books = books.map((b) =>
@@ -430,6 +529,41 @@ document.addEventListener("DOMContentLoaded", async () => {
       saveBooks();
       renderBooks();
       hideEditForm();
+    } else {
+      if (coverInput.files && coverInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const updatedBook = {
+            ...book,
+            title: editFormTitle.value,
+            author: editFormAuthor.value,
+            year: parseInt(editFormYear.value),
+            cover: e.target.result
+          };
+          
+          books = books.map((b) =>
+            b.id === editingBookId ? updatedBook : b
+          );
+          saveBooks();
+          renderBooks();
+          hideEditForm();
+        };
+        reader.readAsDataURL(coverInput.files[0]);
+      } else {
+        const updatedBook = {
+          ...book,
+          title: editFormTitle.value,
+          author: editFormAuthor.value,
+          year: parseInt(editFormYear.value)
+        };
+        
+        books = books.map((b) =>
+          b.id === editingBookId ? updatedBook : b
+        );
+        saveBooks();
+        renderBooks();
+        hideEditForm();
+      }
     }
   };
 
@@ -453,20 +587,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const previewBtn = document.getElementById(previewBtnId);
     
     input.addEventListener('change', () => {
-      previewBtn.disabled = !input.files || !input.files[0];
+      previewBtn.disabled = true; // Will be enabled after cropping
     });
     
     previewBtn.addEventListener('click', () => {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const modal = document.getElementById('imageModal');
-          const modalImage = document.getElementById('modalBookCover');
-          modalImage.src = e.target.result;
-          modal.style.display = 'block';
-          document.body.classList.add('modal-open');
-        };
-        reader.readAsDataURL(input.files[0]);
+      if (input.dataset.croppedImage) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalBookCover');
+        modalImage.src = input.dataset.croppedImage;
+        modal.style.display = 'block';
+        document.body.classList.add('modal-open');
       }
     });
   };
@@ -476,6 +606,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   // Setup preview for edit book form
   setupImagePreview('editFormCover', 'previewEditCoverBtn');
+  
+  attachBookCoverHandlers();
 });
 
 const setViewMode = (mode) => {
@@ -505,11 +637,11 @@ const setViewMode = (mode) => {
       grid.classList.add(`${mode}-view`);
       
       // Re-query DOM for updated items
-      bookItems = grid.querySelectorAll('.book-item');
-      bookItems.forEach(item => {
-        const menuToggle = item.querySelector('.book-menu-toggle');
-        if (menuToggle) menuToggle.style.pointerEvents = 'auto';
-      });
+      // bookItems = grid.querySelectorAll('.book-item');
+      // bookItems.forEach(item => {
+      //   const menuToggle = item.querySelector('.book-menu-toggle');
+      //   if (menuToggle) menuToggle.style.pointerEvents = 'auto';
+      // });
       
       // After transition completes
       const onTransitionEnd = (e) => {
@@ -520,12 +652,24 @@ const setViewMode = (mode) => {
             item.classList.remove('transitioning-to-grid');
             item.classList.remove('transitioning-to-cover');
           });
+
+          // Re-attach event listeners after transition
+          const covers = grid.querySelectorAll('.book-cover');
+          covers.forEach(cover => {
+            cover.removeEventListener('click', openImageModal);
+            cover.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openImageModal(e);
+            });
+          });
           
           // Ensure menu toggles are clickable
           bookItems.forEach(item => {
             const menuToggle = item.querySelector('.book-menu-toggle');
             if (menuToggle) menuToggle.style.pointerEvents = 'auto';
           });
+          
+          attachBookCoverHandlers();
           
           // Re-enable interactions
           grid.style.pointerEvents = '';
@@ -591,8 +735,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-function openImageModal(event) {
-  const bookCover = event.currentTarget;
+function openImageModal(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const bookCover = e.currentTarget;
   const modal = document.getElementById('imageModal');
   const modalImage = document.getElementById('modalBookCover');
   
@@ -622,3 +768,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+function attachBookCoverHandlers() {
+  const bookCovers = document.querySelectorAll('.book-cover');
+  bookCovers.forEach(cover => {
+    cover.removeEventListener('click', openImageModal);
+    cover.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openImageModal(e);
+    });
+  });
+}
