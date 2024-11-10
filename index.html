@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bookshelf App</title>
     <link rel="stylesheet" href="css/style.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-    <script src="js/bookData.js" defer></script>
-    <script src="js/script.js" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+    />
+    <script type="module" src="js/script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
   </head>
   <body>
@@ -15,48 +17,150 @@
       <h1>Bookshelf App</h1>
     </header>
     <main>
+      <!--
+        Action Container Section
+      
+        * View Mode Toggle Button:
+        - Allows switching between grid and list views
+        - Uses SVG icons to indicate current view mode
+        - Includes both grid-view and list-view icons
+        
+        * Add Book Button:
+        - Button to trigger adding a new book
+        - Contains a plus icon SVG and text "Tambah Buku"
+        - Includes data-testid for testing purposes
+        
+        * Theme Toggle Button:
+        - Switches between light and dark themes
+        - Features sun and moon SVG icons
+        - Includes proper ARIA labels for accessibility
+      -->
       <div class="action-container">
         <div class="view-controls">
-          <button id="viewModeToggle" class="view-mode-toggle" aria-label="Toggle view mode">
-            <svg class="list-view-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+          <button
+            id="viewModeToggle"
+            class="view-mode-toggle"
+            aria-label="Toggle view mode"
+          >
+            <svg
+              class="list-view-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"
+              />
             </svg>
-            <svg class="grid-view-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path fill-rule="evenodd" d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H2zM3 3H2v1h1V3z"/>
-              <path d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z"/>
-              <path fill-rule="evenodd" d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H2zm1 .5H2v1h1v-1z"/>
+            <svg
+              class="grid-view-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H2zM3 3H2v1h1V3z"
+              />
+              <path
+                d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H2zm1 .5H2v1h1v-1z"
+              />
             </svg>
           </button>
         </div>
-        <button id="showAddBook" class="btn-add" data-testid="showAddBookButton">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16" style="margin-right: 4px;">
-            <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"/>
+        <button
+          id="showAddBook"
+          class="btn-add"
+          data-testid="showAddBookButton"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="bi bi-plus-lg"
+            viewBox="0 0 16 16"
+            style="margin-right: 4px"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
+            />
           </svg>
           Tambah Buku
         </button>
         <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"/>
-            <line x1="12" y1="1" x2="12" y2="3"/>
-            <line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/>
-            <line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          <svg
+            class="sun-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
           </svg>
-          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          <svg
+            class="moon-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
         </button>
       </div>
 
+      <!--
+        This section represents a modal dialog for adding new books to the bookshelf.
+        
+        Structure:
+        - Modal container with header containing title
+        - Form with the following fields:
+          * Book Cover Upload (with preview button)
+          * Title (required text input)
+          * Author (required text input) 
+          * Year (required number input)
+          * Read Status (checkbox)
+          * Submit button
+          
+        Features:
+        - Accepts image files for book cover
+        - Shows preview button for uploaded cover
+        - Recommends 6:9 ratio for cover images
+        - Input validation for required fields
+        - Year input restricted to positive integers
+        - Checkbox to mark book as completed
+        - Data attributes for testing purposes
+        
+        Form submission button text changes based on completion status
+      -->
       <section id="addBookModal" class="modal">
         <div class="modal-content">
           <div class="modal-header">
             <h2>Tambah Buku Baru</h2>
-            <button class="close-button" id="closeAddBook">&times;</button>
           </div>
           <form id="bookForm" data-testid="bookForm">
             <div class="form-group">
@@ -65,19 +169,31 @@
                 id="bookFormCover"
                 type="file"
                 accept="image/*"
-                data-testid="bookFormCoverInput" />
-              <button 
-                type="button" 
-                id="previewCoverBtn" 
-                class="preview-button" 
-                disabled>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                data-testid="bookFormCoverInput"
+              />
+              <button
+                type="button"
+                id="previewCoverBtn"
+                class="preview-button"
+                disabled
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                  <path
+                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"
+                  />
                 </svg>
                 Preview Cover
               </button>
-              <small class="form-hint">Rekomendasi: Gambar dengan rasio 6:9</small>
+              <small class="form-hint"
+                >Rekomendasi: Gambar dengan rasio 6:9</small
+              >
             </div>
             <div class="form-group">
               <label for="bookFormTitle">Judul</label>
@@ -85,7 +201,8 @@
                 id="bookFormTitle"
                 type="text"
                 required
-                data-testid="bookFormTitleInput" />
+                data-testid="bookFormTitleInput"
+              />
             </div>
             <div class="form-group">
               <label for="bookFormAuthor">Penulis</label>
@@ -93,7 +210,8 @@
                 id="bookFormAuthor"
                 type="text"
                 required
-                data-testid="bookFormAuthorInput" />
+                data-testid="bookFormAuthorInput"
+              />
             </div>
             <div class="form-group">
               <label for="bookFormYear">Tahun</label>
@@ -103,7 +221,8 @@
                 required
                 min="0"
                 step="1"
-                data-testid="bookFormYearInput" />
+                data-testid="bookFormYearInput"
+              />
             </div>
             <div class="form-group">
               <label class="checkbox-wrapper">
@@ -111,73 +230,237 @@
                 <input
                   id="bookFormIsComplete"
                   type="checkbox"
-                  data-testid="bookFormIsCompleteCheckbox" />
+                  data-testid="bookFormIsCompleteCheckbox"
+                />
                 <span class="checkmark"></span>
               </label>
             </div>
             <button
               id="bookFormSubmit"
               type="submit"
-              data-testid="bookFormSubmitButton">
-              Masukkan Buku ke rak
-              <span>B selesai dibaca</span>
-            </button>
+              data-testid="bookFormSubmitButton"
+            ></button>
           </form>
         </div>
       </section>
+
+      <!--
+        Search Section
+        
+        This section contains:
+        - Search input field for book titles
+        - Search button with magnifying glass icon
+        
+        Features:
+        - Card-styled container for search functionality
+        - Text input with placeholder for searching books
+        - Data attribute for testing purposes
+        - Accessible search button with aria-label
+      -->
       <section class="card">
         <div class="search-container">
           <input
             id="searchBookTitle"
             type="text"
             placeholder="Cari judul buku..."
-            data-testid="searchBookFormTitleInput" />
+            data-testid="searchBookFormTitleInput"
+          />
           <button class="search-button" aria-label="Search">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path
+                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
+              />
             </svg>
           </button>
         </div>
       </section>
+
+      <!-- Favorite Books Section 
+
+      Contains:
+      - Section header for favorite books
+      - Sort button with icon for sorting functionality
+      - Book items that show read/unread status but cannot be toggled
+      -->
+      <section class="card">
+        <h2>Buku Favorit</h2>
+        <button
+          class="sort-button"
+          data-section="favorite"
+          aria-label="Sort favorite books"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            class="sort-icon"
+          >
+            <path
+              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"
+            />
+          </svg>
+        </button>
+        <div id="favoriteBookList" class="book-grid">
+          <div class="book-item">
+            <div class="book-actions">
+              <button
+                class="book-menu-toggle"
+                id="bookMenuToggle"
+                aria-label="Toggle book menu"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Book Section: Incomplete Books
+        Contains:
+        - Section header for unfinished books
+        - Sort button with icon for sorting functionality
+        - Grid container for displaying unfinished books 
+        - Book items with menu toggle buttons
+      -->
       <section class="card">
         <h2>Blm. selesai dibaca</h2>
-        <button class="sort-button" data-section="incomplete" aria-label="Sort books">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="sort-icon">
-            <path d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"/>
+        <button
+          class="sort-button"
+          data-section="incomplete"
+          aria-label="Sort books"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            class="sort-icon"
+          >
+            <path
+              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"
+            />
           </svg>
         </button>
         <div id="incompleteBookList" class="book-grid">
           <div class="book-item">
-            <img src="path/to/cover1.jpg" alt="Book Cover" class="book-cover" />
             <div class="book-actions">
-              <button class="book-menu-toggle" id="bookMenuToggle" aria-label="Toggle book menu">
+              <button 
+                class="favorite-toggle" 
+                aria-label="Toggle favorite"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  fill="currentColor" 
+                  class="favorite-icon" 
+                  viewBox="0 0 16 16"
+                >
+                  <path 
+                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
+                  />
+                </svg>
               </button>
+              <button
+                class="book-menu-toggle"
+                id="bookMenuToggle"
+                aria-label="Toggle book menu"
+              ></button>
             </div>
           </div>
         </div>
       </section>
+
+      <!-- Book Section: Complete Books
+        Contains:
+        - Section header for finished books
+        - Sort button with icon for sorting functionality  
+        - Grid container for displaying finished books
+        - Book items with menu toggle buttons
+      -->
       <section class="card">
         <h2>Selesai dibaca</h2>
-        <button class="sort-button" data-section="complete" aria-label="Sort books">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="sort-icon">
-            <path d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"/>
+        <button
+          class="sort-button"
+          data-section="complete"
+          aria-label="Sort books"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            viewBox="0 0 16 16"
+            class="sort-icon"
+          >
+            <path
+              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"
+            />
           </svg>
         </button>
         <div id="completeBookList" class="book-grid">
           <div class="book-item">
-            <img src="path/to/cover2.jpg" alt="Book Cover" class="book-cover" />
             <div class="book-actions">
-              <button class="book-menu-toggle" id="bookMenuToggle" aria-label="Toggle book menu">
+              <button 
+                class="favorite-toggle" 
+                aria-label="Toggle favorite"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  fill="currentColor" 
+                  class="favorite-icon" 
+                  viewBox="0 0 16 16"
+                >
+                  <path 
+                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
+                  />
+                </svg>
               </button>
+              <button
+                class="book-menu-toggle"
+                id="bookMenuToggle"
+                aria-label="Toggle book menu"
+              ></button>
             </div>
           </div>
         </div>
       </section>
+
+      <!--
+        Modal section for editing book details
+
+        Contains a form with the following fields:
+        * Book cover image upload with preview button
+        * Title input field
+        * Author input field 
+        * Year input field
+        
+        Form Features:
+        - File input accepts only images
+        - Required fields validation
+        - Year field accepts only positive integers
+        - Cancel and Save buttons for form actions
+        
+        Data Attributes:
+        - data-testid attributes added for testing purposes
+        
+        Modal Structure:
+        - Form content
+        - Action buttons at bottom
+      -->
       <section id="editBookModal" class="modal">
         <div class="modal-content">
           <div class="modal-header">
             <h2>Edit Buku</h2>
-            <button class="close-button" id="closeEditBook">&times;</button>
           </div>
 
           <form id="editForm" data-testid="editForm">
@@ -187,39 +470,53 @@
                 id="editFormCover"
                 type="file"
                 accept="image/*"
-                data-testid="editFormCoverInput" />
-              <button 
-                type="button" 
-                id="previewEditCoverBtn" 
-                class="preview-button" 
-                disabled>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                  <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+                data-testid="editFormCoverInput"
+              />
+              <button
+                type="button"
+                id="previewEditCoverBtn"
+                class="preview-button"
+                disabled
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+                  <path
+                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"
+                  />
                 </svg>
                 Preview Cover
               </button>
-              <small class="form-hint">Rekomendasi: Gambar dengan rasio 6:9</small>
+              <small class="form-hint"
+                >Rekomendasi: Gambar dengan rasio 6:9</small
+              >
             </div>
-            
+
             <div class="form-group">
               <label for="editFormTitle">Judul</label>
               <input
                 id="editFormTitle"
                 type="text"
                 required
-                data-testid="editFormTitleInput" />
+                data-testid="editFormTitleInput"
+              />
             </div>
-            
+
             <div class="form-group">
               <label for="editFormAuthor">Penulis</label>
               <input
                 id="editFormAuthor"
                 type="text"
                 required
-                data-testid="editFormAuthorInput" />
+                data-testid="editFormAuthorInput"
+              />
             </div>
-            
+
             <div class="form-group">
               <label for="editFormYear">Tahun</label>
               <input
@@ -228,34 +525,55 @@
                 required
                 min="0"
                 step="1"
-                data-testid="editFormYearInput" />
+                data-testid="editFormYearInput"
+              />
             </div>
-      
+
             <div class="modal-actions">
               <button
                 id="editFormCancel"
                 type="button"
                 class="btn-cancel"
-                data-testid="editFormCancelButton">
+                data-testid="editFormCancelButton"
+              >
                 Batalkan
               </button>
               <button
                 id="editFormSubmit"
                 type="submit"
                 class="btn-save"
-                data-testid="editFormSubmitButton">
+                data-testid="editFormSubmitButton"
+              >
                 Simpan
               </button>
             </div>
           </form>
         </div>
       </section>
+
+      <!--
+        Modal sections for image handling:
+
+        Image Modal (#imageModal):
+        - Displays full-size book cover image
+        - Contains:
+          * Modal content wrapper
+          * Image element for book cover display
+
+        Crop Modal (#cropModal):
+        - Interface for image cropping functionality
+        - Contains:
+          * Modal header with title
+          * Container for crop preview
+          * Action buttons:
+          - Cancel button to abort crop
+          - Save button to apply changes
+
+        Note: Both modals are hidden by default
+      -->
       <section id="imageModal" class="image-modal">
         <div class="image-modal-content">
-          <button class="close-button" id="closeImageModal">
-            <span>&times;</span>
-          </button>
-          <img id="modalBookCover" src="" alt="Book Cover" />
+          <img id="modalBookCover" src alt="Book Cover" />
         </div>
       </section>
       <section id="cropModal" class="modal">
@@ -264,7 +582,7 @@
             <h2>Pangkas Gambar</h2>
           </div>
           <div class="crop-container">
-            <img id="cropImage" src="" alt="Image to crop">
+            <img id="cropImage" src alt="Image to crop" />
           </div>
           <div class="modal-actions">
             <button id="cancelCrop" class="btn-cancel">Batalkan</button>
@@ -273,13 +591,19 @@
         </div>
       </section>
     </main>
+
     <footer>
       <p>
-        View this project repository on 
-        <a href="https://github.com/fxrdhan/Bookshelf-App/tree/main" target="_blank" rel="noopener noreferrer">
+        View this project repository on
+        <a
+          href="https://github.com/fxrdhan/Bookshelf-App/tree/main"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           GitHub
         </a>
       </p>
     </footer>
+
   </body>
 </html>

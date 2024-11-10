@@ -363,7 +363,7 @@ button, .btn-save, .btn-cancel, .view-all-button, .btn-add {
   position: relative;
   overflow: hidden;
   background: var(--primary-color);
-  color: white;
+  color: var(--text-color);
   font-family: inherit;
   font-weight: 600;
 }
@@ -566,7 +566,7 @@ button[type="submit"] {
 
 .book-actions button {
   background: var(--primary-color);
-  color: white;
+  color: var(--success-color);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -698,6 +698,10 @@ button[type="submit"] {
 
   .book-content {
     padding-right: 2rem;
+  }
+
+  .favorite-toggle {
+    right: 2.5rem;
   }
 
   .book-item h3 {
@@ -1120,12 +1124,6 @@ body[data-theme="light"] {
   box-shadow: none;
 }
 
-.close-button {
-  display: none;
-  background: transparent;
-  color: transparent;
-}
-
 body.modal-open {
   overflow: hidden;
 }
@@ -1309,6 +1307,74 @@ input[type="file"]::-moz-file-upload-button:hover {
   }
 }
 
+/* Favorite Toggle Button Styles */
+
+.favorite-toggle {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.75rem;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+  opacity: 0.7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.favorite-toggle:hover {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.favorite-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--primary-light);
+  transition: transform 0.3s ease;
+}
+
+.favorite-toggle.active svg {
+  fill: var(--primary-light);
+  stroke: var(--primary-color);
+  stroke-width: 1;
+  animation: heartPop 0.4s ease-out;
+}
+
+@keyframes heartPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Adjust book menu toggle position when favorite button is present */
+.book-menu-toggle {
+  right: 2.5rem;
+}
+
+/* Style for disabled status in favorite books section */
+#favoriteBookList .book-item .btn-complete {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* #favoriteBookList .book-item .btn-complete::before {
+  content: "";
+  color: var(--text-muted);
+  font-size: 0.9em;
+} */
+
 .book-menu-toggle,
 .book-menu-toggle * {
   transition: none;
@@ -1413,7 +1479,7 @@ input[type="file"]::-moz-file-upload-button:hover {
   right: 0;
   z-index: 2; 
   padding: 2rem 0.75rem 0.75rem;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 1), transparent);
   border-radius: 0 0 8px 8px;
   color: white;
 }
@@ -1421,7 +1487,7 @@ input[type="file"]::-moz-file-upload-button:hover {
 .book-grid.cover-view .book-content h3 {
   color: white;
   font-size: 1rem;
-  margin: 0;
+  margin: 0.3rem;
 }
 
 .book-grid.cover-view .book-content p {
@@ -1511,6 +1577,17 @@ input[type="file"]::-moz-file-upload-button:hover {
   height: 100%;
   object-fit: cover;
 }
+
+/* Favorite Books Grid Styles */
+#favoriteBookList {
+    transition: all 0.3s ease;
+  }
+  
+  #favoriteBookList .book-item {
+    position: relative;
+    border: 2px solid var(--primary-light);
+    box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1);
+  }
 
 .search-container {
   position: relative;
@@ -1654,6 +1731,23 @@ input[type="file"]::-moz-file-upload-button:hover {
 
 .book-grid.animating {
   pointer-events: none;
+}
+
+/* Responsive adjustments for favorite toggle */
+/* @media (max-width: 768px) {
+  .favorite-toggle {
+    bottom: 0.5rem;
+    right: 2rem;
+    padding: 0.35rem;
+  }
+} */
+
+@media (max-width: 425px) {
+  .favorite-toggle {
+    bottom: 0.7rem;
+    right: 0.7rem;
+    padding: 0.5rem;
+  }
 }
 
 @media (max-width: 768px) {
