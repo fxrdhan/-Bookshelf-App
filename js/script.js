@@ -1,20 +1,20 @@
 // Define default book cover as SVG data URI for fallback when no cover image is provided
 const DEFAULT_BOOK_COVER = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300">
-  <rect width="200" height="300" fill="#6d28d9" />
-  <defs>
-    <linearGradient id="coverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#16325B;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#1A1A1D;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="200" height="300" fill="url(#coverGradient)" />
-  <path d="M60 100 L140 100 L140 200 L60 200 Z" fill="none" stroke="white" stroke-width="4"/>
-  <path d="M60 100 C80 100 120 100 140 100" stroke="white" stroke-width="4" fill="none"/>
-  <path d="M60 200 C80 200 120 200 140 200" stroke="white" stroke-width="4" fill="none"/>
-  <rect x="75" y="125" width="50" height="3" fill="white" opacity="0.8"/>
-  <rect x="75" y="135" width="40" height="3" fill="white" opacity="0.8"/>
-  <rect x="75" y="145" width="45" height="3" fill="white" opacity="0.8"/>
-  <text x="100" y="240" text-anchor="middle" fill="white" font-family="sans-serif" font-size="16">No Cover</text>
+<rect width="200" height="300" fill="#6d28d9" />
+<defs>
+<linearGradient id="coverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" style="stop-color:#16325B;stop-opacity:1" />
+<stop offset="100%" style="stop-color:#1A1A1D;stop-opacity:1" />
+</linearGradient>
+</defs>
+<rect width="200" height="300" fill="url(#coverGradient)" />
+<path d="M60 100 L140 100 L140 200 L60 200 Z" fill="none" stroke="white" stroke-width="4"/>
+<path d="M60 100 C80 100 120 100 140 100" stroke="white" stroke-width="4" fill="none"/>
+<path d="M60 200 C80 200 120 200 140 200" stroke="white" stroke-width="4" fill="none"/>
+<rect x="75" y="125" width="50" height="3" fill="white" opacity="0.8"/>
+<rect x="75" y="135" width="40" height="3" fill="white" opacity="0.8"/>
+<rect x="75" y="145" width="45" height="3" fill="white" opacity="0.8"/>
+<text x="100" y="240" text-anchor="middle" fill="white" font-family="sans-serif" font-size="16">No Cover</text>
 </svg>`)}`;
 
 // Track sorting order for complete and incomplete book sections
@@ -24,12 +24,17 @@ let sortOrders = {
   favorite: 'asc'
 };
 
+// Initialize PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+let currentCropper = null;
+let currentCropInput = null;
+
 /**
- * Sorts an array of books by title.
- * @param {Array} books - Array of book objects to sort.
- * @param {string} [order='asc'] - Sort direction ('asc' for ascending or 'desc' for descending).
- * @returns {Array} Sorted array of books.
- */
+* Sorts an array of books by title.
+* @param {Array} books - Array of book objects to sort.
+* @param {string} [order='asc'] - Sort direction ('asc' for ascending or 'desc' for descending).
+* @returns {Array} Sorted array of books.
+*/
 const sortBooks = (books, order = 'asc') => {
   return [...books].sort((a, b) => {
     const titleA = a.title.toLowerCase();
@@ -41,6 +46,87 @@ const sortBooks = (books, order = 'asc') => {
       return titleB.localeCompare(titleA);
     }
   });
+};
+
+// New functions for PDF validation and handling
+const validatePDFFile = async (file) => {
+  if (!file) return { isValid: false, size: 0 };
+
+  const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+  const isPDF = file.type === 'application/pdf';
+  const isValidSize = file.size <= maxSize;
+
+  return {
+    isValid: isPDF && isValidSize,
+    isPDF,
+    isValidSize,
+    size: file.size
+  };
+};
+
+/**
+  * Initializes image cropper with specified options
+  * @param {HTMLElement} image - Image element to crop
+  * @param {number} aspectRatio - Desired aspect ratio for cropping
+  */
+function initCropper(image, aspectRatio = 2 / 3) {
+  if (currentCropper) {
+    currentCropper.destroy();
+  }
+
+  currentCropper = new Cropper(image, {
+    aspectRatio: aspectRatio,
+    viewMode: 2,
+    dragMode: 'move',
+    background: true,
+    responsive: true,
+    modal: true,
+    guides: true,
+    highlight: false,
+    autoCropArea: 1,
+  });
+};
+
+// New function to show crop modal
+const showCropModal = (imageUrl) => {
+  const cropModal = document.getElementById('cropModal');
+  const cropImage = document.getElementById('cropImage');
+  
+  cropImage.src = imageUrl;
+  cropModal.style.display = 'block';
+  document.body.classList.add('modal-open');
+  
+  cropImage.addEventListener('load', () => {
+    initCropper(cropImage);
+  }, { once: true });
+};
+
+const generateCoverFromPDF = async (pdfFile) => {
+  try {
+    const arrayBuffer = await pdfFile.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    const page = await pdf.getPage(1);
+
+    const viewport = page.getViewport({ scale: 1.5 });
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    await page.render({
+      canvasContext: context,
+      viewport: viewport
+    }).promise;
+
+    // Instead of returning the data URL directly, show crop modal
+    const pdfCoverImage = canvas.toDataURL('image/jpeg', 0.8);
+    showCropModal(pdfCoverImage);
+    return null;
+  } catch (error) {
+    console.error('Error generating cover from PDF:', error);
+    return null;
+  }
 };
 
 // Main initialization when DOM is loaded
@@ -80,6 +166,101 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initialize books array and load from localStorage
   let books = [];
 
+  // Add validation state tracking
+  let formValidation = {
+    title: false,
+    author: false,
+    year: false,
+    pdf: true
+  };
+
+  // Initialize PDF toggle functionality
+  const pdfToggleBtn = document.querySelector('.pdf-toggle-btn');
+  const pdfUploadContainer = document.getElementById('pdfUploadContainer');
+
+  // Update form hint based on PDF validation
+  const updatePDFHint = (validation) => {
+    const hintElement = document.querySelector('.pdf-upload-container .form-hint');
+    const sizeText = `Max size: 10MB ${validation.isValidSize ? '✓' : '✗'}`;
+    const formatText = `PDF file format ${validation.isPDF ? '✓' : '✗'}`;
+
+    hintElement.innerHTML = `
+    <span style="color: ${validation.isValidSize ? 'var(--success-color)' : 'var(--danger-color)'}">
+      ${sizeText}
+    </span> 
+    <span style="color: ${validation.isPDF ? 'var(--success-color)' : 'var(--danger-color)'}">
+      ${formatText}
+    </span>
+  `;
+  };
+
+  // Add PDF toggle button functionality
+  pdfToggleBtn.addEventListener('click', () => {
+    const isExpanded = pdfToggleBtn.getAttribute('aria-expanded') === 'true';
+    pdfToggleBtn.setAttribute('aria-expanded', !isExpanded);
+    pdfUploadContainer.hidden = isExpanded;
+  });
+
+  // Update submit button state based on form validation
+  const updateSubmitButtonState = () => {
+    const submitButton = document.getElementById('bookFormSubmit');
+    const isCompleteCheckbox = document.getElementById("bookFormIsComplete");
+    const isValid = Object.values(formValidation).every(val =>
+      typeof val === 'boolean' ? val : val.isValid
+    );
+
+    // Set button text based on checkbox state
+    submitButton.innerHTML = isCompleteCheckbox.checked
+      ? 'Masukkan Buku ke rak <span>Selesai dibaca</span>'
+      : 'Masukkan Buku ke rak <span>Blm. selesai dibaca</span>';
+
+    submitButton.disabled = !isValid;
+    submitButton.style.opacity = isValid ? '1' : '0.5';
+  };
+
+  // Add event listeners for form validation
+  document.getElementById('bookFormTitle').addEventListener('input', (e) => {
+    formValidation.title = e.target.value.trim() !== '';
+    submitButton.disabled = !e.target.value.trim();
+    updateSubmitButtonState();
+  });
+
+  document.getElementById('bookFormAuthor').addEventListener('input', (e) => {
+    formValidation.author = e.target.value.trim() !== '';
+    submitButton.disabled = !e.target.value.trim();
+    updateSubmitButtonState();
+  });
+
+  document.getElementById('bookFormYear').addEventListener('input', (e) => {
+    formValidation.year = e.target.value.trim() !== '' &&
+      !isNaN(e.target.value) &&
+      parseInt(e.target.value) > 0;
+    const value = e.target.value.trim();
+    formValidation.year = value !== '' && !isNaN(value) && parseInt(value) > 0;
+    submitButton.disabled = !value || isNaN(value) || parseInt(value) <= 0;
+    updateSubmitButtonState();
+  });
+
+  // Handle PDF file selection
+  document.getElementById('bookFormPDF').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    const validation = file ? await validatePDFFile(file) : {
+      isValid: true,
+      isPDF: true,
+      isValidSize: true,
+      size: 0
+    };
+    
+    formValidation.pdf = validation;
+    updatePDFHint(validation);
+    updateSubmitButtonState();
+  
+    if (validation.isValid && file) {
+      await generateCoverFromPDF(file);
+      currentCropInput = document.getElementById('bookFormCover');
+    }
+  });  
+
   const storedBooks = localStorage.getItem("books");
 
   // Safely parse stored books with error handling
@@ -105,20 +286,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const isCompleteCheckbox = document.getElementById("bookFormIsComplete");
   const submitButton = document.getElementById("bookFormSubmit");
 
-  /**
-   * Updates the submit button text based on the checkbox state.
-   * Improves UX by showing the user where the book will be placed.
-   */
-  const updateSubmitButton = () => {
-    const isChecked = isCompleteCheckbox.checked;
-    submitButton.innerHTML = isChecked
-      ? 'Masukkan Buku ke rak <span>Selesai dibaca</span>'
-      : 'Masukkan Buku ke rak <span>Blm. selesai dibaca</span>';
-  };
-
-  // Attach event listener for completion status changes
-  isCompleteCheckbox.addEventListener("change", updateSubmitButton);
-  updateSubmitButton();
+  // Update submit button text when checkbox changes
+  isCompleteCheckbox.addEventListener("change", updateSubmitButtonState);
+  updateSubmitButtonState(); // Initial update
 
   /**
    * Generates a unique ID for new books
@@ -165,48 +335,48 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Build book element HTML structure
     bookElement.innerHTML += `
-      <img src="${coverSrc}" class="book-cover" alt="Cover ${book.title}">
-      <div class="book-content">
-        <h3 data-testid="bookItemTitle">${book.title}</h3>
-        <p data-testid="bookItemAuthor">${book.author}</p>
-        <p data-testid="bookItemYear">${book.year}</p>
-      </div>
-      <button class="favorite-toggle ${book.isFavorite ? 'active' : ''}" aria-label="Toggle favorite">
-        ${book.isFavorite ? 
-          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-          </svg>` : 
-          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-          </svg>`
-        }
+    <img src="${coverSrc}" class="book-cover" alt="Cover ${book.title}">
+    <div class="book-content">
+      <h3 data-testid="bookItemTitle">${book.title}</h3>
+      <p data-testid="bookItemAuthor">${book.author}</p>
+      <p data-testid="bookItemYear">${book.year}</p>
+    </div>
+    <button class="favorite-toggle ${book.isFavorite ? 'active' : ''}" aria-label="Toggle favorite">
+      ${book.isFavorite ?
+        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+        </svg>` :
+        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+        </svg>`
+      }
+    </button>
+    </div>
+    <button class="book-menu-toggle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+      </svg>
+    </button>
+    <div class="book-actions">
+      <button class="btn-complete" data-testid="bookItemIsCompleteButton">
+        ${book.isComplete ? "Blm. selesai dibaca" : "Selesai dibaca"}
       </button>
-      </div>
-      <button class="book-menu-toggle">
+      <button class="btn-edit" data-testid="bookItemEditButton">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
         </svg>
+        Edit
       </button>
-      <div class="book-actions">
-        <button class="btn-complete" data-testid="bookItemIsCompleteButton">
-          ${book.isComplete ? "Blm. selesai dibaca" : "Selesai dibaca"}
-        </button>
-        <button class="btn-edit" data-testid="bookItemEditButton">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-          </svg>
-          Edit
-        </button>
-        <button class="btn-delete" data-testid="bookItemDeleteButton">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-          </svg>
-          Hapus
-        </button>
-      </div>
-    `;
+      <button class="btn-delete" data-testid="bookItemDeleteButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+          <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+        </svg>
+        Hapus
+      </button>
+    </div>
+  `;
 
     // Set up menu toggle functionality
     const menuToggle = bookElement.querySelector(".book-menu-toggle");
@@ -429,7 +599,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     * Toggles visibility of add book modal
     */
   const toggleAddBookModal = () => {
-    addBookModal.style.display = addBookModal.style.display === "block" ? "none" : "block";
+      const newDisplayState = addBookModal.style.display === "block" ? "none" : "block";
+      addBookModal.style.display = newDisplayState;
+
+      if (newDisplayState === "block") {
+        resetFormHint();
+        document.getElementById("bookForm").reset();
+      }
+
+      document.body.classList.toggle('modal-open', newDisplayState === "block");
   };
 
   showAddBookBtn.addEventListener("click", toggleAddBookModal);
@@ -446,49 +624,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentCropInput = null;
 
   /**
-    * Initializes image cropper with specified options
-    * @param {HTMLElement} image - Image element to crop
-    * @param {number} aspectRatio - Desired aspect ratio for cropping
-    */
-  const initCropper = (image, aspectRatio = 2 / 3) => {
-    if (cropper) {
-      cropper.destroy();
-    }
-
-    cropper = new Cropper(image, {
-      aspectRatio: aspectRatio,
-      viewMode: 2,
-      dragMode: 'move',
-      background: true,
-      responsive: true,
-      modal: true,
-      guides: true,
-      highlight: false,
-      autoCropArea: 1,
-    });
-  };
-
-  /**
     * Handles image selection for book covers
     * @param {HTMLInputElement} input - File input element
     */
+  // Update handleImageSelect function
   const handleImageSelect = (input) => {
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        const cropModal = document.getElementById('cropModal');
-        const cropImage = document.getElementById('cropImage');
-
-        cropImage.src = e.target.result;
-        cropModal.style.display = 'block';
-        document.body.classList.add('modal-open');
-
-        cropImage.addEventListener('load', () => {
-          initCropper(cropImage);
-        }, { once: true });
-
+        showCropModal(e.target.result);
         currentCropInput = input;
       };
 
@@ -515,17 +661,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentCropInput.value = '';
       currentCropInput = null;
     }
-    if (cropper) {
-      cropper.destroy();
-      cropper = null;
+    if (currentCropper) {
+      currentCropper.destroy();
+      currentCropper = null;
     }
   });
 
   // Handle crop application
   document.getElementById('applyCrop').addEventListener('click', () => {
-    if (cropper && currentCropInput) {
+    if (currentCropper && currentCropInput) {
       // Create high-quality cropped image
-      const croppedCanvas = cropper.getCroppedCanvas({
+      const croppedCanvas = currentCropper.getCroppedCanvas({
         width: 600,
         height: 900,
       });
@@ -544,10 +690,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       const cropModal = document.getElementById('cropModal');
       cropModal.style.display = 'none';
       document.body.classList.remove('modal-open');
-      cropper.destroy();
-      cropper = null;
+      currentCropper.destroy();
+      currentCropper = null;
     }
   });
+
+  // Reset form hint text back to default state
+  const resetFormHint = () => {
+    const hintElement = document.querySelector('.pdf-upload-container .form-hint');
+    hintElement.innerHTML = `
+      <span>Max size: 10MB</span>
+      <span>PDF file format</span>
+    `;
+
+    // Reset preview button state
+    const previewBtn = document.getElementById('previewCoverBtn');
+    previewBtn.disabled = true;
+
+    // Clear any stored cropped image data
+    document.getElementById('bookFormCover').dataset.croppedImage = '';
+  };
 
   /**
     * Handles book addition form submission
@@ -590,9 +752,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       books.push(newBook);
       saveBooks();
       renderBooks();
+      resetFormHint();
       toggleAddBookModal();
       event.target.reset();
-      updateSubmitButton(false);
     };
 
     // Handle different cover image scenarios
@@ -822,15 +984,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     button.addEventListener('click', () => {
       const section = button.dataset.section;
       let targetList, filteredBooks;
-      
+
       if (section === 'favorite') {
         targetList = favoriteList;
         filteredBooks = books.filter(book => book.isFavorite);
       } else {
         targetList = section === 'incomplete' ? incompleteList : completeList;
         filteredBooks = books.filter(book =>
-        section === 'incomplete' ? !book.isComplete : book.isComplete
-      );
+          section === 'incomplete' ? !book.isComplete : book.isComplete
+        );
       }
 
       // Toggle sort order and update button state
@@ -845,9 +1007,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 /**
-  * Sets view mode for book display (grid or cover)
-  * @param {string} mode - Display mode ('grid' or 'cover')
-  */
+* Sets view mode for book display (grid or cover)
+* @param {string} mode - Display mode ('grid' or 'cover')
+*/
 const setViewMode = (mode) => {
   const bookGrids = document.querySelectorAll('.book-grid');
   const currentMode = localStorage.getItem('viewMode') || 'grid';
@@ -882,9 +1044,9 @@ const setViewMode = (mode) => {
 };
 
 /**
-    * Initializes view mode toggle functionality
-    * Manages transitions between grid and cover views
-    */
+  * Initializes view mode toggle functionality
+  * Manages transitions between grid and cover views
+  */
 const initializeViewModeToggle = () => {
   const viewModeToggle = document.getElementById('viewModeToggle');
   if (!viewModeToggle) return;
@@ -936,9 +1098,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
-  * Opens image modal for book cover preview
-  * @param {Event} e - Click event on book cover
-  */
+* Opens image modal for book cover preview
+* @param {Event} e - Click event on book cover
+*/
 function openImageModal(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -952,8 +1114,8 @@ function openImageModal(e) {
 }
 
 /**
-  * Closes image preview modal
-  */
+* Closes image preview modal
+*/
 function closeImageModal() {
   const modal = document.getElementById('imageModal');
   modal.style.display = 'none';
@@ -979,9 +1141,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
-  * Attaches click handlers to all book covers
-  * Replaces existing covers with new ones to prevent event duplication
-  */
+* Attaches click handlers to all book covers
+* Replaces existing covers with new ones to prevent event duplication
+*/
 function attachBookCoverHandlers() {
   const bookCovers = document.querySelectorAll('.book-cover');
   bookCovers.forEach(cover => {

@@ -1206,10 +1206,9 @@ body.modal-open {
   margin-bottom: 1.5rem;
 }
 
-.form-hint {
+.form-hint span {
   color: var(--text-muted);
   font-size: 0.875rem;
-  margin-top: 0.25rem;
 }
 
 input[type="file"] {
@@ -1220,10 +1219,24 @@ input[type="file"] {
   background: var(--input-bg);
   color: var(--text-color);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; 
+  position: relative;
 }
 
+.pdf-upload-container input[type="file"]::file-selector-button:hover {
+  background: var(--primary-dark);
+}
+
+/* .pdf-upload-container input[type="file"].has-file + .form-hint {
+  color: var(--primary-light);
+}
+
+:root[data-theme="light"] .pdf-upload-container input[type="file"].has-file + .form-hint{
+  color: var(--primary-color);
+} */
+
 input[type="file"]:hover {
+  border: 2px dashed var(--border-color);
   border-color: var(--primary-color);
   background: var(--surface-color);
 }
@@ -2139,4 +2152,71 @@ section.card {
 
 section.card h2 {
   margin-right: 3rem;
+}
+
+.pdf-upload-section {
+  margin-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+}
+
+.pdf-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pdf-toggle-btn:hover {
+  background: var(--input-bg);
+}
+
+.pdf-toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.pdf-toggle-btn[aria-expanded="true"] .pdf-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.pdf-upload-container {
+  margin-top: 0.5rem;
+  /* padding: 1rem; */
+  padding: 1rem 1rem 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  /* background: var(--input-bg); */
+  transition: all 0.3s ease;
+}
+
+.pdf-upload-container[hidden] {
+  display: none;
+}
+
+.pdf-upload-container input[type="file"] {
+  width: 100%;
+  /* margin-bottom: 0.5rem; */
+}
+.form-hint span {
+  display: inline-block;
+  margin-top: 0.5rem;
+  margin-left: 0.1rem;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pdf-toggle-btn {
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
 }

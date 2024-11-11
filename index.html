@@ -7,11 +7,17 @@
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
-    />
+      href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css" />
     <script type="module" src="js/script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   </head>
+
   <body>
     <header>
       <h1>Bookshelf App</h1>
@@ -40,19 +46,16 @@
           <button
             id="viewModeToggle"
             class="view-mode-toggle"
-            aria-label="Toggle view mode"
-          >
+            aria-label="Toggle view mode">
             <svg
               class="list-view-icon"
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
               fill="currentColor"
-              viewBox="0 0 16 16"
-            >
+              viewBox="0 0 16 16">
               <path
-                d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"
-              />
+                d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z" />
             </svg>
             <svg
               class="grid-view-icon"
@@ -60,27 +63,22 @@
               width="16"
               height="16"
               fill="currentColor"
-              viewBox="0 0 16 16"
-            >
+              viewBox="0 0 16 16">
               <path
                 fill-rule="evenodd"
-                d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H2zM3 3H2v1h1V3z"
-              />
+                d="M2 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5V3a.5.5 0 0 0-.5-.5H2zM3 3H2v1h1V3z" />
               <path
-                d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z"
-              />
+                d="M5 3.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM5.5 7a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9zm0 4a.5.5 0 0 0 0 1h9a.5.5 0 0 0 0-1h-9z" />
               <path
                 fill-rule="evenodd"
-                d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H2zm1 .5H2v1h1v-1z"
-              />
+                d="M1.5 7a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5V7zM2 7h1v1H2V7zm0 3.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H2zm1 .5H2v1h1v-1z" />
             </svg>
           </button>
         </div>
         <button
           id="showAddBook"
           class="btn-add"
-          data-testid="showAddBookButton"
-        >
+          data-testid="showAddBookButton">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -88,12 +86,10 @@
             fill="currentColor"
             class="bi bi-plus-lg"
             viewBox="0 0 16 16"
-            style="margin-right: 4px"
-          >
+            style="margin-right: 4px">
             <path
               fill-rule="evenodd"
-              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2"
-            />
+              d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2" />
           </svg>
           Tambah Buku
         </button>
@@ -106,8 +102,7 @@
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+            stroke-linejoin="round">
             <circle cx="12" cy="12" r="5" />
             <line x1="12" y1="1" x2="12" y2="3" />
             <line x1="12" y1="21" x2="12" y2="23" />
@@ -126,8 +121,7 @@
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
-            stroke-linejoin="round"
-          >
+            stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
         </button>
@@ -169,31 +163,24 @@
                 id="bookFormCover"
                 type="file"
                 accept="image/*"
-                data-testid="bookFormCoverInput"
-              />
+                data-testid="bookFormCoverInput" />
               <button
                 type="button"
                 id="previewCoverBtn"
                 class="preview-button"
-                disabled
-              >
+                disabled>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
                   height="16"
                   fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
+                  viewBox="0 0 16 16">
                   <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
                   <path
-                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"
-                  />
+                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
                 </svg>
                 Preview Cover
               </button>
-              <small class="form-hint"
-                >Rekomendasi: Gambar dengan rasio 6:9</small
-              >
             </div>
             <div class="form-group">
               <label for="bookFormTitle">Judul</label>
@@ -201,8 +188,7 @@
                 id="bookFormTitle"
                 type="text"
                 required
-                data-testid="bookFormTitleInput"
-              />
+                data-testid="bookFormTitleInput" />
             </div>
             <div class="form-group">
               <label for="bookFormAuthor">Penulis</label>
@@ -210,8 +196,7 @@
                 id="bookFormAuthor"
                 type="text"
                 required
-                data-testid="bookFormAuthorInput"
-              />
+                data-testid="bookFormAuthorInput" />
             </div>
             <div class="form-group">
               <label for="bookFormYear">Tahun</label>
@@ -221,8 +206,39 @@
                 required
                 min="0"
                 step="1"
-                data-testid="bookFormYearInput"
-              />
+                data-testid="bookFormYearInput" />
+            </div>
+            <div class="form-group pdf-upload-section">
+              <button
+                type="button"
+                class="pdf-toggle-btn"
+                aria-expanded="false"
+                aria-controls="pdfUploadContainer">
+                <span>Upload PDF (Optional)</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  class="pdf-toggle-icon">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </button>
+              <div id="pdfUploadContainer" class="pdf-upload-container" hidden>
+                <input
+                  id="bookFormPDF"
+                  type="file"
+                  accept="application/pdf"
+                  data-testid="bookFormPDFInput" />
+                <span class="form-hint">
+                  <span>
+                    Max size: 10MB. PDF file format.
+                  </span>
+                </span>
+              </div>
             </div>
             <div class="form-group">
               <label class="checkbox-wrapper">
@@ -230,16 +246,14 @@
                 <input
                   id="bookFormIsComplete"
                   type="checkbox"
-                  data-testid="bookFormIsCompleteCheckbox"
-                />
+                  data-testid="bookFormIsCompleteCheckbox" />
                 <span class="checkmark"></span>
               </label>
             </div>
             <button
               id="bookFormSubmit"
               type="submit"
-              data-testid="bookFormSubmitButton"
-            ></button>
+              data-testid="bookFormSubmitButton"></button>
           </form>
         </div>
       </section>
@@ -263,19 +277,16 @@
             id="searchBookTitle"
             type="text"
             placeholder="Cari judul buku..."
-            data-testid="searchBookFormTitleInput"
-          />
+            data-testid="searchBookFormTitleInput" />
           <button class="search-button" aria-label="Search">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
               height="16"
               fill="currentColor"
-              viewBox="0 0 16 16"
-            >
+              viewBox="0 0 16 16">
               <path
-                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
-              />
+                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
             </svg>
           </button>
         </div>
@@ -293,19 +304,16 @@
         <button
           class="sort-button"
           data-section="favorite"
-          aria-label="Sort favorite books"
-        >
+          aria-label="Sort favorite books">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
             fill="currentColor"
             viewBox="0 0 16 16"
-            class="sort-icon"
-          >
+            class="sort-icon">
             <path
-              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"
-            />
+              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
           </svg>
         </button>
         <div id="favoriteBookList" class="book-grid">
@@ -314,8 +322,7 @@
               <button
                 class="book-menu-toggle"
                 id="bookMenuToggle"
-                aria-label="Toggle book menu"
-              ></button>
+                aria-label="Toggle book menu"></button>
             </div>
           </div>
         </div>
@@ -333,46 +340,37 @@
         <button
           class="sort-button"
           data-section="incomplete"
-          aria-label="Sort books"
-        >
+          aria-label="Sort books">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
             fill="currentColor"
             viewBox="0 0 16 16"
-            class="sort-icon"
-          >
+            class="sort-icon">
             <path
-              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"
-            />
+              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
           </svg>
         </button>
         <div id="incompleteBookList" class="book-grid">
           <div class="book-item">
             <div class="book-actions">
-              <button 
-                class="favorite-toggle" 
-                aria-label="Toggle favorite"
-              >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="16" 
-                  height="16" 
-                  fill="currentColor" 
-                  class="favorite-icon" 
-                  viewBox="0 0 16 16"
-                >
-                  <path 
-                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
-                  />
+              <button class="favorite-toggle" aria-label="Toggle favorite">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="favorite-icon"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
                 </svg>
               </button>
               <button
                 class="book-menu-toggle"
                 id="bookMenuToggle"
-                aria-label="Toggle book menu"
-              ></button>
+                aria-label="Toggle book menu"></button>
             </div>
           </div>
         </div>
@@ -390,46 +388,37 @@
         <button
           class="sort-button"
           data-section="complete"
-          aria-label="Sort books"
-        >
+          aria-label="Sort books">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
             fill="currentColor"
             viewBox="0 0 16 16"
-            class="sort-icon"
-          >
+            class="sort-icon">
             <path
-              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z"
-            />
+              d="M3.5 3.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 12.293V3.5zm4 .5a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1h-1zm0 3a.5.5 0 0 1 0-1h3a.5.5 0 0 1 0 1h-3zm0 3a.5.5 0 0 1 0-1h5a.5.5 0 0 1 0 1h-5zM7 12.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7a.5.5 0 0 0-.5.5z" />
           </svg>
         </button>
         <div id="completeBookList" class="book-grid">
           <div class="book-item">
             <div class="book-actions">
-              <button 
-                class="favorite-toggle" 
-                aria-label="Toggle favorite"
-              >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  width="16" 
-                  height="16" 
-                  fill="currentColor" 
-                  class="favorite-icon" 
-                  viewBox="0 0 16 16"
-                >
-                  <path 
-                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"
-                  />
+              <button class="favorite-toggle" aria-label="Toggle favorite">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="favorite-icon"
+                  viewBox="0 0 16 16">
+                  <path
+                    d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z" />
                 </svg>
               </button>
               <button
                 class="book-menu-toggle"
                 id="bookMenuToggle"
-                aria-label="Toggle book menu"
-              ></button>
+                aria-label="Toggle book menu"></button>
             </div>
           </div>
         </div>
@@ -470,31 +459,24 @@
                 id="editFormCover"
                 type="file"
                 accept="image/*"
-                data-testid="editFormCoverInput"
-              />
+                data-testid="editFormCoverInput" />
               <button
                 type="button"
                 id="previewEditCoverBtn"
                 class="preview-button"
-                disabled
-              >
+                disabled>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
                   height="16"
                   fill="currentColor"
-                  viewBox="0 0 16 16"
-                >
+                  viewBox="0 0 16 16">
                   <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
                   <path
-                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"
-                  />
+                    d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" />
                 </svg>
                 Preview Cover
               </button>
-              <small class="form-hint"
-                >Rekomendasi: Gambar dengan rasio 6:9</small
-              >
             </div>
 
             <div class="form-group">
@@ -503,8 +485,7 @@
                 id="editFormTitle"
                 type="text"
                 required
-                data-testid="editFormTitleInput"
-              />
+                data-testid="editFormTitleInput" />
             </div>
 
             <div class="form-group">
@@ -513,8 +494,7 @@
                 id="editFormAuthor"
                 type="text"
                 required
-                data-testid="editFormAuthorInput"
-              />
+                data-testid="editFormAuthorInput" />
             </div>
 
             <div class="form-group">
@@ -525,8 +505,7 @@
                 required
                 min="0"
                 step="1"
-                data-testid="editFormYearInput"
-              />
+                data-testid="editFormYearInput" />
             </div>
 
             <div class="modal-actions">
@@ -534,16 +513,14 @@
                 id="editFormCancel"
                 type="button"
                 class="btn-cancel"
-                data-testid="editFormCancelButton"
-              >
+                data-testid="editFormCancelButton">
                 Batalkan
               </button>
               <button
                 id="editFormSubmit"
                 type="submit"
                 class="btn-save"
-                data-testid="editFormSubmitButton"
-              >
+                data-testid="editFormSubmitButton">
                 Simpan
               </button>
             </div>
@@ -590,6 +567,44 @@
           </div>
         </div>
       </section>
+      <!-- PDF Reader Modal -->
+      <section id="pdfReaderModal" class="modal">
+        <div class="modal-content pdf-reader">
+          <div class="modal-header">
+            <h2 id="pdfTitle">PDF Reader</h2>
+            <button
+              id="closePDFReader"
+              class="close-button"
+              aria-label="Close PDF reader">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="pdf-container">
+            <canvas id="pdfCanvas"></canvas>
+          </div>
+
+          <div class="pdf-controls">
+            <button id="prevPage" class="pdf-nav-btn" disabled>
+              <span>Previous</span>
+            </button>
+            <span id="pageInfo" class="page-info">Page 1 of 1</span>
+            <button id="nextPage" class="pdf-nav-btn" disabled>
+              <span>Next</span>
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer>
@@ -598,12 +613,10 @@
         <a
           href="https://github.com/fxrdhan/Bookshelf-App/tree/main"
           target="_blank"
-          rel="noopener noreferrer"
-        >
+          rel="noopener noreferrer">
           GitHub
         </a>
       </p>
     </footer>
-
   </body>
 </html>
