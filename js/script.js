@@ -63,16 +63,30 @@ async function openPdfViewer(pdfUrl, title) {
     document.body.classList.add('modal-open');
     pdfTitle.textContent = title;
 
+    // Check if running on Chrome mobile and request fullscreen
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      && /Chrome/i.test(navigator.userAgent)) {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          await document.documentElement.webkitRequestFullscreen();
+        }
+      } catch (error) {
+        console.log('Fullscreen request failed:', error);
+      }
+    }
+
     // Add swipe hint
     const hint = document.createElement('div');
     hint.className = 'pdf-swipe-hint';
-    hint.textContent = 'Swipe to change pages';
+    hint.textContent = 'Swipe left/right to change pages';
     pdfReaderModal.appendChild(hint);
 
     // Load the PDF
     pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
     document.getElementById('pageInfo').textContent = `Page 1 of ${pdfDoc.numPages}`;
-    
+
     // // Enable/disable buttons based on page count
     // document.getElementById('prevPage').disabled = true;
     // document.getElementById('nextPage').disabled = pdfDoc.numPages <= 1;
@@ -126,7 +140,7 @@ function renderPage(num) {
 
     page.render(renderContext).promise.then(() => {
       pageRendering = false;
-      
+
       if (pageNumPending !== null) {
         renderPage(pageNumPending);
         pageNumPending = null;
@@ -168,11 +182,11 @@ function handleTouchStart(e) {
 
 function handleTouchMove(e) {
   if (!isDragging) return;
-  
+
   const currentX = e.touches[0].clientX;
   const diff = currentX - touchStartX;
   currentTranslateX = diff;
-  
+
   // Update canvas position during swipe
   const canvas = document.getElementById('pdfCanvas');
   canvas.style.transform = `translateX(${diff}px)`;
@@ -180,13 +194,13 @@ function handleTouchMove(e) {
 
 function handleTouchEnd(e) {
   if (!isDragging) return;
-  
+
   isDragging = false;
   const canvas = document.getElementById('pdfCanvas');
-  
+
   // Reset transform
   canvas.style.transform = 'translateX(0)';
-  
+
   // If swipe was long enough, change page
   if (Math.abs(currentTranslateX) > 50) {
     if (currentTranslateX > 0 && pageNum > 1) {
@@ -208,22 +222,22 @@ function handleMouseDown(e) {
 
 function handleMouseMove(e) {
   if (!isDragging) return;
-  
+
   const currentX = e.clientX;
   const diff = currentX - touchStartX;
   currentTranslateX = diff;
-  
+
   const canvas = document.getElementById('pdfCanvas');
   canvas.style.transform = `translateX(${diff}px)`;
 }
 
 function handleMouseUp(e) {
   if (!isDragging) return;
-  
+
   isDragging = false;
   const canvas = document.getElementById('pdfCanvas');
   canvas.style.transform = 'translateX(0)';
-  
+
   if (Math.abs(currentTranslateX) > 50) {
     if (currentTranslateX > 0 && pageNum > 1) {
       pageNum--;
@@ -241,7 +255,20 @@ function handleMouseUp(e) {
  * @description Hides the PDF reader modal, removes modal-open class from body,
  * and resets PDF document and page number variables to their initial states
  */
-function closePdfViewer() {
+async function closePdfViewer() {
+  // Exit fullscreen if active
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    try {
+      if (document.exitFullscreen) {
+        await document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        await document.webkitExitFullscreen();
+      }
+    } catch (error) {
+      console.log('Exit fullscreen failed:', error);
+    }
+  }
+
   const pdfReaderModal = document.getElementById('pdfReaderModal');
   pdfReaderModal.style.display = 'none';
   document.body.classList.remove('modal-open');
@@ -311,11 +338,11 @@ function initCropper(image, aspectRatio = 2 / 3) {
 const showCropModal = (imageUrl) => {
   const cropModal = document.getElementById('cropModal');
   const cropImage = document.getElementById('cropImage');
-  
+
   cropImage.src = imageUrl;
   cropModal.style.display = 'block';
   document.body.classList.add('modal-open');
-  
+
   cropImage.addEventListener('load', () => {
     initCropper(cropImage);
   }, { once: true });
@@ -470,16 +497,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       isValidSize: true,
       size: 0
     };
-    
+
     formValidation.pdf = validation;
     updatePDFHint(validation);
     updateSubmitButtonState();
-  
+
     if (validation.isValid && file) {
       await generateCoverFromPDF(file);
       currentCropInput = document.getElementById('bookFormCover');
     }
-  });  
+  });
 
   const storedBooks = localStorage.getItem("books");
 
@@ -563,13 +590,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
       <button class="favorite-toggle ${book.isFavorite ? 'active' : ''}" aria-label="Toggle favorite">
         ${book.isFavorite ?
-          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
           </svg>` :
-          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
           </svg>`
-        }
+      }
       </button>
       </div>
       <button class="book-menu-toggle">
@@ -827,15 +854,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     * Toggles visibility of add book modal
     */
   const toggleAddBookModal = () => {
-      const newDisplayState = addBookModal.style.display === "block" ? "none" : "block";
-      addBookModal.style.display = newDisplayState;
+    const newDisplayState = addBookModal.style.display === "block" ? "none" : "block";
+    addBookModal.style.display = newDisplayState;
 
-      if (newDisplayState === "block") {
-        resetFormHint();
-        document.getElementById("bookForm").reset();
-      }
+    if (newDisplayState === "block") {
+      resetFormHint();
+      document.getElementById("bookForm").reset();
+    }
 
-      document.body.classList.toggle('modal-open', newDisplayState === "block");
+    document.body.classList.toggle('modal-open', newDisplayState === "block");
   };
 
   showAddBookBtn.addEventListener("click", toggleAddBookModal);
@@ -883,8 +910,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   //   renderPage(pageNum);
   // });
 
-  document.getElementById('closePDFReader').addEventListener('click', closePdfViewer);
-
+  document.getElementById('closePDFReader').addEventListener('click', () => {
+    closePdfViewer();
+  });  
 
   // Attach image selection handlers to both form inputs
   document.getElementById('bookFormCover').addEventListener('change', (e) => {
@@ -1009,14 +1037,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         cover: coverUrl || DEFAULT_BOOK_COVER,
         pdfUrl: pdfUrl
       };
-    
+
       books.push(newBook);
       saveBooks();
       renderBooks();
       resetFormHint();
       toggleAddBookModal();
       event.target.reset();
-    };    
+    };
 
     // Handle different cover image scenarios
     if (coverInput.dataset.croppedImage) {
