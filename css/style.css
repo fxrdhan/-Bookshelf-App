@@ -1102,7 +1102,7 @@ body[data-theme="light"] {
 .pdf-reader .pdf-container {
   flex: 1 1 auto;
   overflow: auto;
-  padding: 0 0 0rem 0;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1112,7 +1112,7 @@ body[data-theme="light"] {
 
 .pdf-reader #pdfCanvas {
   max-width: 100%;
-  max-height: calc(100vh - 220px);
+  max-height: calc(100vh - 190px);
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-x pan-y;
@@ -1138,13 +1138,14 @@ body[data-theme="light"] {
 
 @media (max-width: 425px) {
   .pdf-reader .pdf-container {
-    padding-bottom: 6rem;
+    padding-bottom: 4rem;
     height: calc(100vh - 120px);
+    overflow: hidden;
   }
 
   .pdf-reader #pdfCanvas {
-    padding: 1rem;
-    max-height: calc(100vh - 200px);
+    padding: 1rem 1rem 3rem 1rem;
+    max-height: calc(100vh - 120px);
   }
 }
 
@@ -1157,10 +1158,16 @@ body[data-theme="light"] {
 .pdf-reader .pdf-swipe-container {
   position: relative;
   width: 100%;
-  height: 100%;
-  padding-bottom: 4rem;
+  /* height: 100%; */
+  /* padding-bottom: 4rem; */
   overflow: hidden;
   touch-action: pan-x pan-y;
+}
+
+@media (min-width: 768px) {
+  .pdf-reader .pdf-swipe-container {
+    height: 100%;
+  }
 }
 
 .pdf-swipe-hint {
@@ -1433,7 +1440,7 @@ input[type="file"]::-moz-file-upload-button:hover {
 .btn-add {
   font-size: 1rem;
   font-weight: 700;
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   background: linear-gradient(
     135deg,
     var(--primary-color),

@@ -135,8 +135,6 @@ function renderPage(num) {
   };
 
   pdfDoc.getPage(num).then((page) => {
-    // const viewport = page.getViewport({ scale });
-
     // Get viewport with higher quality settings
     const viewport = page.getViewport({ 
       scale: scale,
@@ -146,16 +144,9 @@ function renderPage(num) {
       offsetY: 0
     });
 
-    // canvas.height = viewport.height;
-    // canvas.width = viewport.width;
-
     // Scale canvas dimensions for HiDPI
     canvas.width = Math.floor(viewport.width * outputScale.sx);
     canvas.height = Math.floor(viewport.height * outputScale.sy);
-
-    // // Scale canvas style dimensions
-    // canvas.style.width = Math.floor(viewport.width) + 'px';
-    // canvas.style.height = Math.floor(viewport.height) + 'px';
 
     // Set canvas scale for HiDPI displays
     const ctx = canvas.getContext('2d');
@@ -192,8 +183,6 @@ function renderPage(num) {
     });
 
     document.getElementById('pageInfo').textContent = `Page ${pageNum} of ${pdfDoc.numPages}`;
-    // document.getElementById('prevPage').disabled = pageNum <= 1;
-    // document.getElementById('nextPage').disabled = pageNum >= pdfDoc.numPages;
   });
 }
 
@@ -940,19 +929,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       reader.readAsDataURL(file);
     }
   };
-
-  // // Event listeners untuk navigasi PDF
-  // document.getElementById('prevPage').addEventListener('click', () => {
-  //   if (pageNum <= 1) return;
-  //   pageNum--;
-  //   renderPage(pageNum);
-  // });
-
-  // document.getElementById('nextPage').addEventListener('click', () => {
-  //   if (pageNum >= pdfDoc.numPages) return;
-  //   pageNum++;
-  //   renderPage(pageNum);
-  // });
 
   document.getElementById('closePDFReader').addEventListener('click', () => {
     closePdfViewer();
