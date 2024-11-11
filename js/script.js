@@ -82,7 +82,7 @@ async function openPdfViewer(pdfUrl, title) {
     // Add swipe hint
     const hint = document.createElement('div');
     hint.className = 'pdf-swipe-hint';
-    hint.textContent = 'Swipe left/right to change pages';
+    hint.textContent = 'Swipe left/right to turn pages';
     pdfReaderModal.appendChild(hint);
 
     // Load the PDF
