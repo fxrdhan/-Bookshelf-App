@@ -29,6 +29,122 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs
 let currentCropper = null;
 let currentCropInput = null;
 
+// PDF viewer state dan fungsi
+let pdfDoc = null;
+let pageNum = 1;
+let pageRendering = false;
+let pageNumPending = null;
+let scale = 1.0;
+
+/**
+ * Opens a PDF viewer modal and displays the specified PDF document
+ * @async
+ * @param {string} pdfUrl - The URL of the PDF file to be displayed
+ * @param {string} title - The title to be shown in the PDF viewer modal
+ * @throws {Error} When PDF loading fails
+ * @returns {Promise<void>}
+ * @description
+`*
+ * This function:
+ * - Shows a modal with PDF viewer
+ * - Adds modal-open class to body
+ * - Loads and renders the first page of PDF
+ * - Initializes page navigation controls
+ * - Handles errors during PDF loading
+ */
+async function openPdfViewer(pdfUrl, title) {
+  const pdfReaderModal = document.getElementById('pdfReaderModal');
+  const pdfTitle = document.getElementById('pdfTitle');
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+
+  try {
+    pdfReaderModal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    pdfTitle.textContent = title;
+
+    // Load the PDF
+    pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+    document.getElementById('pageInfo').textContent = `Page 1 of ${pdfDoc.numPages}`;
+    
+    // Enable/disable buttons based on page count
+    document.getElementById('prevPage').disabled = true;
+    document.getElementById('nextPage').disabled = pdfDoc.numPages <= 1;
+
+    // Render first page
+    pageNum = 1;
+    renderPage(pageNum);
+  } catch (error) {
+    console.error('Error loading PDF:', error);
+    alert('Error loading PDF. Please try again.');
+    closePdfViewer();
+  }
+}
+
+/**
+ * Renders a specific page from the PDF document onto the canvas.
+ * Handles page rendering queue to prevent multiple simultaneous renders.
+ * Updates UI elements including page information and navigation buttons.
+ * 
+ * @param {number} num - The page number to render
+ * @returns {void}
+ * 
+ * @requires {PDFDocumentProxy} pdfDoc - The loaded PDF document
+ * @requires {HTMLCanvasElement} pdfCanvas - The canvas element for rendering
+ * @requires {number} scale - The zoom scale for the PDF viewport
+ * @requires {boolean} pageRendering - Flag indicating if a page is currently being rendered
+ * @requires {number|null} pageNumPending - Stores the next page to render if one is pending
+ * @requires {number} pageNum - The current page number being displayed
+ */
+function renderPage(num) {
+  if (pageRendering) {
+    pageNumPending = num;
+    return;
+  }
+
+  pageRendering = true;
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+
+  pdfDoc.getPage(num).then((page) => {
+    const viewport = page.getViewport({ scale });
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    const renderContext = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
+
+    page.render(renderContext).promise.then(() => {
+      pageRendering = false;
+      
+      if (pageNumPending !== null) {
+        renderPage(pageNumPending);
+        pageNumPending = null;
+      }
+    });
+
+    document.getElementById('pageInfo').textContent = `Page ${pageNum} of ${pdfDoc.numPages}`;
+    document.getElementById('prevPage').disabled = pageNum <= 1;
+    document.getElementById('nextPage').disabled = pageNum >= pdfDoc.numPages;
+  });
+}
+
+/**
+ * Closes the PDF viewer modal and resets PDF-related variables
+ * @function closePdfViewer
+ * @description Hides the PDF reader modal, removes modal-open class from body,
+ * and resets PDF document and page number variables to their initial states
+ */
+function closePdfViewer() {
+  const pdfReaderModal = document.getElementById('pdfReaderModal');
+  pdfReaderModal.style.display = 'none';
+  document.body.classList.remove('modal-open');
+  pdfDoc = null;
+  pageNum = 1;
+}
+
 /**
 * Sorts an array of books by title.
 * @param {Array} books - Array of book objects to sort.
@@ -335,48 +451,56 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Build book element HTML structure
     bookElement.innerHTML += `
-    <img src="${coverSrc}" class="book-cover" alt="Cover ${book.title}">
-    <div class="book-content">
-      <h3 data-testid="bookItemTitle">${book.title}</h3>
-      <p data-testid="bookItemAuthor">${book.author}</p>
-      <p data-testid="bookItemYear">${book.year}</p>
-    </div>
-    <button class="favorite-toggle ${book.isFavorite ? 'active' : ''}" aria-label="Toggle favorite">
-      ${book.isFavorite ?
-        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-        </svg>` :
-        `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-        </svg>`
-      }
-    </button>
-    </div>
-    <button class="book-menu-toggle">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-      </svg>
-    </button>
-    <div class="book-actions">
-      <button class="btn-complete" data-testid="bookItemIsCompleteButton">
-        ${book.isComplete ? "Blm. selesai dibaca" : "Selesai dibaca"}
+      <img src="${coverSrc}" class="book-cover" alt="Cover ${book.title}">
+      <div class="book-content">
+        <h3 data-testid="bookItemTitle" class="${book.pdfUrl ? 'has-pdf' : ''}" style="cursor: ${book.pdfUrl ? 'pointer' : 'default'}">${book.title}</h3>
+        <p data-testid="bookItemAuthor">${book.author}</p>
+        <p data-testid="bookItemYear">${book.year}</p>
+      </div>
+      <button class="favorite-toggle ${book.isFavorite ? 'active' : ''}" aria-label="Toggle favorite">
+        ${book.isFavorite ?
+          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+          </svg>` :
+          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+          </svg>`
+        }
       </button>
-      <button class="btn-edit" data-testid="bookItemEditButton">
+      </div>
+      <button class="book-menu-toggle">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-          <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+          <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
         </svg>
-        Edit
       </button>
-      <button class="btn-delete" data-testid="bookItemDeleteButton">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-          <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-          <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-        </svg>
-        Hapus
-      </button>
-    </div>
-  `;
+      <div class="book-actions">
+        <button class="btn-complete" data-testid="bookItemIsCompleteButton">
+          ${book.isComplete ? "Blm. selesai dibaca" : "Selesai dibaca"}
+        </button>
+        <button class="btn-edit" data-testid="bookItemEditButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+          </svg>
+          Edit
+        </button>
+        <button class="btn-delete" data-testid="bookItemDeleteButton">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+          </svg>
+          Hapus
+        </button>
+      </div>
+    `;
+
+    // Event listener for title
+    const titleElement = bookElement.querySelector('[data-testid="bookItemTitle"]');
+    if (book.pdfUrl) {
+      titleElement.addEventListener('click', () => {
+        openPdfViewer(book.pdfUrl, book.title);
+      });
+    }
 
     // Set up menu toggle functionality
     const menuToggle = bookElement.querySelector(".book-menu-toggle");
@@ -642,6 +766,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
+  // Event listeners untuk navigasi PDF
+  document.getElementById('prevPage').addEventListener('click', () => {
+    if (pageNum <= 1) return;
+    pageNum--;
+    renderPage(pageNum);
+  });
+
+  document.getElementById('nextPage').addEventListener('click', () => {
+    if (pageNum >= pdfDoc.numPages) return;
+    pageNum++;
+    renderPage(pageNum);
+  });
+
+  document.getElementById('closePDFReader').addEventListener('click', closePdfViewer);
+
+
   // Attach image selection handlers to both form inputs
   document.getElementById('bookFormCover').addEventListener('change', (e) => {
     handleImageSelect(e.target);
@@ -731,6 +871,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const isComplete = document.getElementById("bookFormIsComplete").checked;
     const coverInput = document.getElementById("bookFormCover");
+    const pdfInput = document.getElementById("bookFormPDF");
+    let pdfUrl = null;
 
     let coverUrl = null;
 
@@ -739,6 +881,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       * @param {string} coverUrl - URL or data URI of book cover
       */
     const createAndSaveBook = (coverUrl) => {
+      // Handle PDF file
+      if (pdfInput.files && pdfInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          pdfUrl = e.target.result;
+          saveBookWithPdf(coverUrl, pdfUrl);
+        };
+        reader.readAsDataURL(pdfInput.files[0]);
+      } else {
+        saveBookWithPdf(coverUrl, null);
+      }
+    };
+
+    const saveBookWithPdf = (coverUrl, pdfUrl) => {
       const newBook = {
         id: generateId(),
         title,
@@ -746,16 +902,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         year,
         isComplete,
         isFavorite: false,
-        cover: coverUrl || DEFAULT_BOOK_COVER
+        cover: coverUrl || DEFAULT_BOOK_COVER,
+        pdfUrl: pdfUrl
       };
-
+    
       books.push(newBook);
       saveBooks();
       renderBooks();
       resetFormHint();
       toggleAddBookModal();
       event.target.reset();
-    };
+    };    
 
     // Handle different cover image scenarios
     if (coverInput.dataset.croppedImage) {
