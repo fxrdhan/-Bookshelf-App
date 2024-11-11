@@ -34,7 +34,9 @@ let pdfDoc = null;
 let pageNum = 1;
 let pageRendering = false;
 let pageNumPending = null;
-let scale = 1.0;
+// let scale = 1.0;
+const pixelRatio = window.devicePixelRatio || 1;
+let scale = 2.0 * pixelRatio; 
 
 /**
  * Opens a PDF viewer modal and displays the specified PDF document
@@ -128,15 +130,61 @@ function renderPage(num) {
   const canvas = document.getElementById('pdfCanvas');
   const ctx = canvas.getContext('2d');
 
+  // Define outputScale for HiDPI displays
+  const pixelRatio = window.devicePixelRatio || 1;
+  const outputScale = {
+    sx: pixelRatio,
+    sy: pixelRatio,
+    scaled: pixelRatio !== 1
+  };
+
   pdfDoc.getPage(num).then((page) => {
-    const viewport = page.getViewport({ scale });
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
+    // const viewport = page.getViewport({ scale });
+
+    // Get viewport with higher quality settings
+    const viewport = page.getViewport({ 
+      scale: scale,
+      rotation: 0,
+      dontFlip: false,
+      offsetX: 0,
+      offsetY: 0
+    });
+
+    // canvas.height = viewport.height;
+    // canvas.width = viewport.width;
+
+    // Scale canvas dimensions for HiDPI
+    canvas.width = Math.floor(viewport.width * outputScale.sx);
+    canvas.height = Math.floor(viewport.height * outputScale.sy);
+
+    // // Scale canvas style dimensions
+    // canvas.style.width = Math.floor(viewport.width) + 'px';
+    // canvas.style.height = Math.floor(viewport.height) + 'px';
+
+    // Set canvas scale for HiDPI displays
+    const ctx = canvas.getContext('2d');
+    const transform = outputScale !== 1 ? [outputScale, 0, 0, outputScale, 0, 0] : null;
 
     const renderContext = {
       canvasContext: ctx,
-      viewport: viewport
+      viewport: viewport,
+      // Enable image smoothing
+      imageSmoothing: true,
+      // Set transform for HiDPI
+      // transform: transform,
+      transform: outputScale.scaled ? [outputScale.sx, 0, 0, outputScale.sy, 0, 0] : null,
+      // Enable background rendering
+      background: 'white',
+      // Enable text rendering
+      textLayer: true,
+      // Set render quality
+      renderInteractiveForms: true,
+      enableWebGL: true
     };
+
+    // Clear canvas before rendering
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     page.render(renderContext).promise.then(() => {
       pageRendering = false;
