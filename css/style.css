@@ -1165,6 +1165,7 @@ body[data-theme="light"] {
   font-size: 0.9rem;
   opacity: 0.8;
   pointer-events: none;
+  text-align: center;
 }
 
 /* .pdf-reader .pdf-nav-btn {
