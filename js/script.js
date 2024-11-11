@@ -61,10 +61,6 @@ async function openPdfViewer(pdfUrl, title) {
   const ctx = canvas.getContext('2d');
 
   try {
-    pdfReaderModal.style.display = 'block';
-    document.body.classList.add('modal-open');
-    pdfTitle.textContent = title;
-
     // Check if running on Chrome mobile and request fullscreen
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       && /Chrome/i.test(navigator.userAgent)) {
@@ -79,6 +75,10 @@ async function openPdfViewer(pdfUrl, title) {
       }
     }
 
+    pdfReaderModal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    pdfTitle.textContent = title;
+
     // Add swipe hint
     const hint = document.createElement('div');
     hint.className = 'pdf-swipe-hint';
@@ -88,10 +88,6 @@ async function openPdfViewer(pdfUrl, title) {
     // Load the PDF
     pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
     document.getElementById('pageInfo').textContent = `Page 1 of ${pdfDoc.numPages}`;
-
-    // // Enable/disable buttons based on page count
-    // document.getElementById('prevPage').disabled = true;
-    // document.getElementById('nextPage').disabled = pdfDoc.numPages <= 1;
 
     // Render first page
     pageNum = 1;
