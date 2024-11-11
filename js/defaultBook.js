@@ -1,5 +1,5 @@
 // Ensure defaultBooks is attached to the window object for global access
-export const defaultBooks = [
+const defaultBooks = [
     {
         id: "1",
         title: "Bumi",
@@ -7,7 +7,7 @@ export const defaultBooks = [
         year: 2014,
         isComplete: false,
         isFavorite: false,
-        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/data/bumi.jpg"
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/bumi.jpg"
     },
     {
         id: "2",
@@ -16,7 +16,7 @@ export const defaultBooks = [
         year: 2019,
         isComplete: false,
         isFavorite: false,
-        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/data/moon.jpg"
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/moon.jpg"
     },
     {
         id: "3",
@@ -25,7 +25,7 @@ export const defaultBooks = [
         year: 2016,
         isComplete: false,
         isFavorite: false,
-        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/data/matahari.jpg"
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/matahari.jpg"
     },
     {
         id: "4",
@@ -34,7 +34,7 @@ export const defaultBooks = [
         year: 2021,
         isComplete: false,
         isFavorite: false,
-        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/data/nebula.jpg"
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/nebula.jpg"
     },
     {
         id: "5",
@@ -43,7 +43,7 @@ export const defaultBooks = [
         year: 2014,
         isComplete: false,
         isFavorite: false,
-        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/data/bintang.jpg"
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/bintang.jpg"
     },
     {
         id: "6",
@@ -51,7 +51,21 @@ export const defaultBooks = [
         author: "Tere Liye",
         year: 2019,
         isComplete: false,
+        isFavorite: false,
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/ceros-dan-batozar.jpg"
+    },
+    {
+        id: "7",
+        title: "Mirai",
+        author: "Mosaka Hamodo",
+        year: 2000,
+        isComplete: false,
         isFavorite: true,
-        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/data/ceros-dan-batozar.jpg"
+        cover: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/cover/mirai.jpg",
+        pdfUrl: "https://raw.githubusercontent.com/fxrdhan/Bookshelf-App/main/default-books/pdf/mirai.pdf"
     },
 ];
+
+if (typeof window !== 'undefined') {
+    window.defaultBooks = defaultBooks;
+}
