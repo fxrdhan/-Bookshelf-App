@@ -332,7 +332,7 @@ const sortBooks = (books, order = 'asc') => {
 const validatePDFFile = async (file) => {
   if (!file) return { isValid: false, size: 0 };
 
-  const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+  const maxSize = 50 * 1024 * 1024; // 10MB in bytes
   const isPDF = file.type === 'application/pdf';
   const isValidSize = file.size <= maxSize;
 
@@ -461,7 +461,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Update form hint based on PDF validation
   const updatePDFHint = (validation) => {
     const hintElement = document.querySelector('.pdf-upload-container .form-hint');
-    const sizeText = `Max size: 10MB ${validation.isValidSize ? '✓' : '✗'}`;
+    const sizeText = `Max size: 50MB ${validation.isValidSize ? '✓' : '✗'}`;
     const formatText = `PDF file format ${validation.isPDF ? '✓' : '✗'}`;
 
     hintElement.innerHTML = `
@@ -991,7 +991,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resetFormHint = () => {
     const hintElement = document.querySelector('.pdf-upload-container .form-hint');
     hintElement.innerHTML = `
-      <span>Max size: 10MB</span>
+      <span>Max size: 50MB</span>
       <span>PDF file format</span>
     `;
 

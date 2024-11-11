@@ -178,7 +178,7 @@ section.card {
   border-radius: 12px;
 }
 
-section {
+section:not(.modal) {
   background: var(--surface-color);
   padding: 1.5rem;
   margin-bottom: 2rem;
@@ -905,7 +905,7 @@ footer a:hover {
   top: 0;
   right: 0;
   background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.5);
   border-radius: 50%;
   width: 44px;
@@ -992,7 +992,7 @@ body[data-theme="light"] {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   display: none;
   align-items: center;
   justify-content: center;
@@ -1006,7 +1006,7 @@ body[data-theme="light"] {
   height: 100vh;
   background-color: transparent;
   z-index: 1000;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
   margin: 0;
   padding: 0;
 }
@@ -1020,7 +1020,7 @@ body[data-theme="light"] {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 
 .modal-content:not(.pdf-reader) {
@@ -1091,7 +1091,7 @@ body[data-theme="light"] {
   border: none;
   padding: 0.5rem;
   cursor: pointer;
-  color: var(--text-color);
+  color: white;
   z-index: 10;
 }
 
@@ -1136,6 +1136,10 @@ body[data-theme="light"] {
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
+.pdf-reader .modal-header {
+  padding: 1.25rem 0rem 1rem 0rem;
+}
+
 @media (max-width: 425px) {
   .pdf-reader .pdf-container {
     padding-bottom: 4rem;
@@ -1144,9 +1148,20 @@ body[data-theme="light"] {
   }
 
   .pdf-reader #pdfCanvas {
-    padding: 1rem 1rem 3rem 1rem;
+    /* padding: 1rem 1rem 3rem 1rem; */
+    padding-top: 1rem;
+    padding-bottom: 3rem;
     max-height: calc(100vh - 120px);
   }
+
+  .pdf-reader .modal-header {
+    padding: 1.25rem 0rem 0rem 0rem;
+  }
+}
+
+.pdf-reader .modal-header h2 {
+  color: white;
+  border: none;
 }
 
 .pdf-reader .page-info {
@@ -1175,9 +1190,9 @@ body[data-theme="light"] {
   bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
-  color: var(--text-muted);
+  color: white;
   font-size: 0.9rem;
-  opacity: 0.8;
+  opacity: 0.6;
   pointer-events: none;
   text-align: center;
 }
