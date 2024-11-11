@@ -57,7 +57,7 @@ const defaultBooks = [
     {
         id: "7",
         title: "Mirai",
-        author: "Mosaka Hamodo",
+        author: "Mamoru Hosoda",
         year: 2000,
         isComplete: false,
         isFavorite: true,
