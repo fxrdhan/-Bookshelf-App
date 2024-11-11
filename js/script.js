@@ -63,17 +63,25 @@ async function openPdfViewer(pdfUrl, title) {
     document.body.classList.add('modal-open');
     pdfTitle.textContent = title;
 
+    // Add swipe hint
+    const hint = document.createElement('div');
+    hint.className = 'pdf-swipe-hint';
+    hint.textContent = 'Swipe left/rgiht to change pages';
+    pdfReaderModal.appendChild(hint);
+
     // Load the PDF
     pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
     document.getElementById('pageInfo').textContent = `Page 1 of ${pdfDoc.numPages}`;
     
-    // Enable/disable buttons based on page count
-    document.getElementById('prevPage').disabled = true;
-    document.getElementById('nextPage').disabled = pdfDoc.numPages <= 1;
+    // // Enable/disable buttons based on page count
+    // document.getElementById('prevPage').disabled = true;
+    // document.getElementById('nextPage').disabled = pdfDoc.numPages <= 1;
 
     // Render first page
     pageNum = 1;
     renderPage(pageNum);
+
+    initTouchHandling();
   } catch (error) {
     console.error('Error loading PDF:', error);
     alert('Error loading PDF. Please try again.');
@@ -126,9 +134,105 @@ function renderPage(num) {
     });
 
     document.getElementById('pageInfo').textContent = `Page ${pageNum} of ${pdfDoc.numPages}`;
-    document.getElementById('prevPage').disabled = pageNum <= 1;
-    document.getElementById('nextPage').disabled = pageNum >= pdfDoc.numPages;
+    // document.getElementById('prevPage').disabled = pageNum <= 1;
+    // document.getElementById('nextPage').disabled = pageNum >= pdfDoc.numPages;
   });
+}
+
+let touchStartX = 0;
+let touchEndX = 0;
+let isDragging = false;
+let currentTranslateX = 0;
+
+function initTouchHandling() {
+  const canvas = document.getElementById('pdfCanvas');
+  const container = canvas.parentElement;
+
+  // Touch events
+  container.addEventListener('touchstart', handleTouchStart, { passive: true });
+  container.addEventListener('touchmove', handleTouchMove, { passive: true });
+  container.addEventListener('touchend', handleTouchEnd);
+
+  // Mouse events for desktop
+  container.addEventListener('mousedown', handleMouseDown);
+  container.addEventListener('mousemove', handleMouseMove);
+  container.addEventListener('mouseup', handleMouseUp);
+  container.addEventListener('mouseleave', handleMouseUp);
+}
+
+function handleTouchStart(e) {
+  touchStartX = e.touches[0].clientX;
+  isDragging = true;
+  currentTranslateX = 0;
+}
+
+function handleTouchMove(e) {
+  if (!isDragging) return;
+  
+  const currentX = e.touches[0].clientX;
+  const diff = currentX - touchStartX;
+  currentTranslateX = diff;
+  
+  // Update canvas position during swipe
+  const canvas = document.getElementById('pdfCanvas');
+  canvas.style.transform = `translateX(${diff}px)`;
+}
+
+function handleTouchEnd(e) {
+  if (!isDragging) return;
+  
+  isDragging = false;
+  const canvas = document.getElementById('pdfCanvas');
+  
+  // Reset transform
+  canvas.style.transform = 'translateX(0)';
+  
+  // If swipe was long enough, change page
+  if (Math.abs(currentTranslateX) > 50) {
+    if (currentTranslateX > 0 && pageNum > 1) {
+      pageNum--;
+      renderPage(pageNum);
+    } else if (currentTranslateX < 0 && pageNum < pdfDoc.numPages) {
+      pageNum++;
+      renderPage(pageNum);
+    }
+  }
+}
+
+// Mouse event handlers for desktop support
+function handleMouseDown(e) {
+  touchStartX = e.clientX;
+  isDragging = true;
+  currentTranslateX = 0;
+}
+
+function handleMouseMove(e) {
+  if (!isDragging) return;
+  
+  const currentX = e.clientX;
+  const diff = currentX - touchStartX;
+  currentTranslateX = diff;
+  
+  const canvas = document.getElementById('pdfCanvas');
+  canvas.style.transform = `translateX(${diff}px)`;
+}
+
+function handleMouseUp(e) {
+  if (!isDragging) return;
+  
+  isDragging = false;
+  const canvas = document.getElementById('pdfCanvas');
+  canvas.style.transform = 'translateX(0)';
+  
+  if (Math.abs(currentTranslateX) > 50) {
+    if (currentTranslateX > 0 && pageNum > 1) {
+      pageNum--;
+      renderPage(pageNum);
+    } else if (currentTranslateX < 0 && pageNum < pdfDoc.numPages) {
+      pageNum++;
+      renderPage(pageNum);
+    }
+  }
 }
 
 /**
@@ -766,18 +870,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   };
 
-  // Event listeners untuk navigasi PDF
-  document.getElementById('prevPage').addEventListener('click', () => {
-    if (pageNum <= 1) return;
-    pageNum--;
-    renderPage(pageNum);
-  });
+  // // Event listeners untuk navigasi PDF
+  // document.getElementById('prevPage').addEventListener('click', () => {
+  //   if (pageNum <= 1) return;
+  //   pageNum--;
+  //   renderPage(pageNum);
+  // });
 
-  document.getElementById('nextPage').addEventListener('click', () => {
-    if (pageNum >= pdfDoc.numPages) return;
-    pageNum++;
-    renderPage(pageNum);
-  });
+  // document.getElementById('nextPage').addEventListener('click', () => {
+  //   if (pageNum >= pdfDoc.numPages) return;
+  //   pageNum++;
+  //   renderPage(pageNum);
+  // });
 
   document.getElementById('closePDFReader').addEventListener('click', closePdfViewer);
 
