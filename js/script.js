@@ -36,7 +36,7 @@ let pageRendering = false;
 let pageNumPending = null;
 // let scale = 1.0;
 const pixelRatio = window.devicePixelRatio || 1;
-let scale = 2.0 * pixelRatio; 
+let scale = 2.0 * pixelRatio;
 
 /**
  * Opens a PDF viewer modal and displays the specified PDF document
@@ -136,7 +136,7 @@ function renderPage(num) {
 
   pdfDoc.getPage(num).then((page) => {
     // Get viewport with higher quality settings
-    const viewport = page.getViewport({ 
+    const viewport = page.getViewport({
       scale: scale,
       rotation: 0,
       dontFlip: false,
@@ -420,28 +420,45 @@ document.addEventListener("DOMContentLoaded", async () => {
    * Sets the application theme and updates UI accordingly.
    * @param {string} theme - Theme to set ('light' or 'dark').
    */
-  const setTheme = (theme) => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);
+  const setTheme = (theme, showAlert = false) => {
+    // document.documentElement.setAttribute("data-theme", theme);
+    // localStorage.setItem("theme", theme);
 
-    if (theme === "light") {
-      sunIcon.style.display = "none";
-      moonIcon.style.display = "block";
-    } else {
-      sunIcon.style.display = "block";
-      moonIcon.style.display = "none";
+    // if (theme === "light") {
+    //   sunIcon.style.display = "none";
+    //   moonIcon.style.display = "block";
+    // } else {
+    //   sunIcon.style.display = "block";
+    //   moonIcon.style.display = "none";
+    // }
+
+    if (showAlert) {
+      window.alert("Mohon maaf. Mode terang sedang dalam pengembangan. Saat ini hanya tersedia mode gelap.");
+      return;
     }
+
+    // Force dark theme
+    document.documentElement.setAttribute("data-theme", "dark");
+    localStorage.setItem("theme", "dark");
+    sunIcon.style.display = "block";
+    moonIcon.style.display = "none";
   };
 
   // Load saved theme preference from localStorage or default to dark
-  const savedTheme = localStorage.getItem("theme") || "dark";
-  setTheme(savedTheme);
+  // const savedTheme = localStorage.getItem("theme") || "dark";
+  localStorage.setItem("theme", "dark");
+  setTheme("true", false);
+
+  // Theme toggle click handler
+  themeToggle.addEventListener("click", () => {
+    setTheme("dark", true);  // Show alert when user clicks toggle
+  });
 
   // Handle theme toggle button clicks
-  themeToggle.addEventListener("click", () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme");
-    setTheme(currentTheme === "light" ? "dark" : "light");
-  });
+  // themeToggle.addEventListener("click", () => {
+  //   const currentTheme = document.documentElement.getAttribute("data-theme");
+  //   setTheme(currentTheme === "light" ? "dark" : "light");
+  // });
 
   // Initialize books array and load from localStorage
   let books = [];
@@ -492,7 +509,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Set button text based on checkbox state
     submitButton.innerHTML = isCompleteCheckbox.checked
       ? 'Masukkan Buku ke rak <span>Selesai dibaca</span>'
-      : 'Masukkan Buku ke rak <span>Blm. selesai dibaca</span>';
+      : 'Masukkan Buku ke rak <span>Sedang dibaca</span>';
 
     submitButton.disabled = !isValid;
     submitButton.style.opacity = isValid ? '1' : '0.5';
@@ -639,7 +656,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </button>
       <div class="book-actions">
         <button class="btn-complete" data-testid="bookItemIsCompleteButton">
-          ${book.isComplete ? "Blm. selesai dibaca" : "Selesai dibaca"}
+          ${book.isComplete ? "Sedang dibaca" : "Selesai dibaca"}
         </button>
         <button class="btn-edit" data-testid="bookItemEditButton">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -932,7 +949,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   document.getElementById('closePDFReader').addEventListener('click', () => {
     closePdfViewer();
-  });  
+  });
 
   // Attach image selection handlers to both form inputs
   document.getElementById('bookFormCover').addEventListener('change', (e) => {
