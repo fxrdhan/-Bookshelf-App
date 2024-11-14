@@ -54,6 +54,10 @@ let scale = 2.0 * pixelRatio;
  * - Initializes page navigation controls
  * - Handles errors during PDF loading
  */
+
+const pagesToPreload = 3;
+const preloadedPages = [];
+
 async function openPdfViewer(pdfUrl, title) {
   const pdfReaderModal = document.getElementById('pdfReaderModal');
   const pdfTitle = document.getElementById('pdfTitle');
@@ -61,6 +65,12 @@ async function openPdfViewer(pdfUrl, title) {
   const ctx = canvas.getContext('2d');
 
   try {
+    // Show loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'pdf-loading';
+    loadingIndicator.textContent = 'Loading PDF...';
+    pdfReaderModal.appendChild(loadingIndicator);
+
     // Check if running on Chrome mobile and request fullscreen
     if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
       && /Chrome/i.test(navigator.userAgent)) {
@@ -75,10 +85,6 @@ async function openPdfViewer(pdfUrl, title) {
       }
     }
 
-    pdfReaderModal.style.display = 'block';
-    document.body.classList.add('modal-open');
-    pdfTitle.textContent = title;
-
     // Add swipe hint
     const hint = document.createElement('div');
     hint.className = 'pdf-swipe-hint';
@@ -87,19 +93,83 @@ async function openPdfViewer(pdfUrl, title) {
 
     // Load the PDF
     pdfDoc = await pdfjsLib.getDocument(pdfUrl).promise;
+
+
+    for (let i = 1; i <= Math.min(pagesToPreload, pdfDoc.numPages); i++) {
+      const page = await pdfDoc.getPage(i);
+      preloadedPages.push(page);
+    }
+
+    // Remove loading indicator
+    loadingIndicator.remove();
+
+    pdfReaderModal.style.display = 'block';
+    document.body.classList.add('modal-open');
+    pdfTitle.textContent = title;
+
     document.getElementById('pageInfo').textContent = `Page 1 of ${pdfDoc.numPages}`;
 
-    // Render first page
+    // Render first preload page
     pageNum = 1;
-    renderPage(pageNum);
+    renderPreloadedPage(preloadedPages[0]);
 
     initTouchHandling();
+
+    // Start preloading next batch of pages in background
+    preloadNextPages(pagesToPreload + 1, 2 * pagesToPreload);
   } catch (error) {
     console.error('Error loading PDF:', error);
     alert('Error loading PDF. Please try again.');
     closePdfViewer();
   }
 }
+
+// New function to render preloaded page
+async function renderPreloadedPage(page) {
+  if (pageRendering) {
+    pageNumPending = pageNum;
+    return;
+  }
+
+  pageRendering = true;
+  const canvas = document.getElementById('pdfCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const viewport = page.getViewport({
+    scale: scale,
+    rotation: 0
+  });
+
+  canvas.width = Math.floor(viewport.width * outputScale.sx);
+  canvas.height = Math.floor(viewport.height * outputScale.sy);
+
+  const renderContext = {
+    canvasContext: ctx,
+    viewport: viewport,
+    transform: outputScale.scaled ? [outputScale.sx, 0, 0, outputScale.sy, 0, 0] : null,
+  };
+
+  await page.render(renderContext).promise;
+  pageRendering = false;
+
+  if (pageNumPending !== null) {
+    renderPage(pageNumPending);
+    pageNumPending = null;
+  }
+}
+
+// New function to preload pages in background
+async function preloadNextPages(startPage, endPage) {
+  for (let i = startPage; i <= Math.min(endPage, pdfDoc.numPages); i++) {
+    try {
+      const page = await pdfDoc.getPage(i);
+      preloadedPages[i - 1] = page;
+    } catch (error) {
+      console.warn(`Failed to preload page ${i}:`, error);
+    }
+  }
+}
+
 
 /**
  * Renders a specific page from the PDF document onto the canvas.
@@ -116,6 +186,12 @@ async function openPdfViewer(pdfUrl, title) {
  * @requires {number|null} pageNumPending - Stores the next page to render if one is pending
  * @requires {number} pageNum - The current page number being displayed
  */
+let outputScale = {
+  sx: window.devicePixelRatio || 1,
+  sy: window.devicePixelRatio || 1,
+  scaled: window.devicePixelRatio !== 1
+};
+
 function renderPage(num) {
   if (pageRendering) {
     pageNumPending = num;
@@ -125,14 +201,6 @@ function renderPage(num) {
   pageRendering = true;
   const canvas = document.getElementById('pdfCanvas');
   const ctx = canvas.getContext('2d');
-
-  // Define outputScale for HiDPI displays
-  const pixelRatio = window.devicePixelRatio || 1;
-  const outputScale = {
-    sx: pixelRatio,
-    sy: pixelRatio,
-    scaled: pixelRatio !== 1
-  };
 
   pdfDoc.getPage(num).then((page) => {
     // Get viewport with higher quality settings
