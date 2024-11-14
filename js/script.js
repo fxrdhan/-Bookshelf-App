@@ -281,28 +281,16 @@ function handleTouchStart(e) {
   currentTranslateX = 0;
 }
 
-function handleTouchMove(e) {
+const handleTouchMove = (e) => {
   if (!isDragging) return;
-
   const currentX = e.touches[0].clientX;
-  const diff = currentX - touchStartX;
-  currentTranslateX = diff;
-
-  // Update canvas position during swipe
-  const canvas = document.getElementById('pdfCanvas');
-  canvas.style.transform = `translateX(${diff}px)`;
-}
+  currentTranslateX = currentX - touchStartX;
+};
 
 function handleTouchEnd(e) {
   if (!isDragging) return;
-
   isDragging = false;
-  const canvas = document.getElementById('pdfCanvas');
-
-  // Reset transform
-  canvas.style.transform = 'translateX(0)';
-
-  // If swipe was long enough, change page
+  
   if (Math.abs(currentTranslateX) > 50) {
     if (currentTranslateX > 0 && pageNum > 1) {
       pageNum--;
@@ -323,22 +311,14 @@ function handleMouseDown(e) {
 
 function handleMouseMove(e) {
   if (!isDragging) return;
-
   const currentX = e.clientX;
-  const diff = currentX - touchStartX;
-  currentTranslateX = diff;
-
-  const canvas = document.getElementById('pdfCanvas');
-  canvas.style.transform = `translateX(${diff}px)`;
+  currentTranslateX = currentX - touchStartX;
 }
 
 function handleMouseUp(e) {
   if (!isDragging) return;
-
   isDragging = false;
-  const canvas = document.getElementById('pdfCanvas');
-  canvas.style.transform = 'translateX(0)';
-
+  
   if (Math.abs(currentTranslateX) > 50) {
     if (currentTranslateX > 0 && pageNum > 1) {
       pageNum--;
